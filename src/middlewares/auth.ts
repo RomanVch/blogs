@@ -3,8 +3,6 @@ import {Request, Response, NextFunction} from "express";
 export const auth = (req:Request, res:Response, next:NextFunction) => {
 
     const auth = [{login: 'admin', password: 'qwerty'},{login: '1234', password: '1234'}];
-
-
     if(req.headers.authorization){
         const typeAuth = (req.headers.authorization).split(' ')[0]
         if(typeAuth === 'Basic'){
