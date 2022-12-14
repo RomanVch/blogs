@@ -16,7 +16,6 @@ export const auth = (req:Request, res:Response, next:NextFunction) => {
         }
             res.status(401).send('Authentication required.');
     } else {
-        res.set('WWW-Authenticate', 'Basic realm="401"');
         res.status(401).send('Authentication required.');
     }
 
