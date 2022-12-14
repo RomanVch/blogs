@@ -2,7 +2,7 @@ import { Router } from "express";
 import { dataBase } from "../repository/dataBase";
 import { errorsValidatorMiddleware } from "../middlewares/errors-middlewares";;
 import { postRepository } from "../repository/postRepository";
-import { validBodyString } from "../utils/validators";
+import {validBlogID, validBodyString} from "../utils/validators";
 import { auth } from "../middlewares/auth";
 
 export const postRouter = Router({});
@@ -15,7 +15,7 @@ postRouter.post('/',
     auth,
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),
-    validBodyString('blogId',1,1000),
+    validBlogID(),
     validBodyString('title'),
     errorsValidatorMiddleware,
     (req, res) => {
