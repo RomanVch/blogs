@@ -14,7 +14,7 @@ export const auth = (req:Request, res:Response, next:NextFunction) => {
         }
             res.status(401).send('Authentication required.');
         } else {
-            res.status(400).send('Authentication required.')
+            res.status(401).send('Authentication required.')
         }
         } else {
         res.status(401).send('Authentication required.');
