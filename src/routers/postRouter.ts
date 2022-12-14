@@ -35,7 +35,7 @@ postRouter.put('/:id',
     auth,
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),
-    validBodyString('blogId',1,1000),
+    validBlogID(),
     validBodyString('title'),
     errorsValidatorMiddleware, (req, res) => {
     const id = req.params.id;
