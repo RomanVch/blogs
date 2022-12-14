@@ -2,7 +2,7 @@ import {Request, Response, NextFunction} from "express";
 
 export const auth = (req:Request, res:Response, next:NextFunction) => {
 
-    const auth = [{login: '123', password: '123'},{login: '1234', password: '1234'}];
+    const auth = [{login: 'admin', password: 'qwerty'},{login: '1234', password: '1234'}];
 
 
     if(req.headers.authorization){
