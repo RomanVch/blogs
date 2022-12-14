@@ -13,10 +13,10 @@ postRouter.get('/', (req, res) => {
 
 postRouter.post('/',
     auth,
-    validBodyString('title'),
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),
     validBodyString('blogId',1,1000),
+    validBodyString('title'),
     errorsValidatorMiddleware,
     (req, res) => {
     const {title,shortDescription,content,blogId} = req.body
@@ -33,10 +33,10 @@ postRouter.get('/:id',
 
 postRouter.put('/:id',
     auth,
-    validBodyString('title'),
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),
     validBodyString('blogId',1,1000),
+    validBodyString('title'),
     errorsValidatorMiddleware, (req, res) => {
     const id = req.params.id;
     const {title,shortDescription,content,blogId} = req.body

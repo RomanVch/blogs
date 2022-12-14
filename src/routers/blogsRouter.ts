@@ -14,8 +14,8 @@ blogsRouter.get('/', (req, res) => {
 
 blogsRouter.post('/',
     auth,
-    validBodyString('name',1,15),
     validBodyString('description',1,500),
+    validBodyString('name',1,15),
     validUrl('websiteUrl',1,100,/(https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/),
     errorsValidatorMiddleware,
     (req, res) => {
@@ -32,9 +32,9 @@ blogsRouter.get('/:id',
 
 blogsRouter.put('/:id',
     auth,
-    validBodyString('name',1,15),
     validBodyString('description',1,500),
     validUrl('websiteUrl',1,100,/(https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/),
+    validBodyString('name',1,15),
     errorsValidatorMiddleware,
     (req, res) => {
         const id = req.params.id;
