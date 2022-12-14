@@ -21,7 +21,7 @@ blogsRouter.post('/',
     (req, res) => {
         const {name,description,websiteUrl} = req.body
         const newPost = blogsRepository.addBlog({name,description,websiteUrl})
-        res.send(newPost);
+        res.status(201).send(newPost);
     })
 blogsRouter.get('/:id',
     errorsValidatorMiddleware,

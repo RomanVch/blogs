@@ -21,7 +21,7 @@ postRouter.post('/',
     (req, res) => {
     const {title,shortDescription,content,blogId} = req.body
     const newPost = postRepository.addPost({title,shortDescription,content,blogId})
-        res.send(newPost);
+        res.status(201).send(newPost);
 })
 
 postRouter.get('/:id',
