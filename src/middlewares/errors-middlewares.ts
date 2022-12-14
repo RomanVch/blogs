@@ -4,8 +4,8 @@ export const errorsValidatorMiddleware =(req:Request,res:Response,next:NextFunct
     const errors = validationResult(req).array({ onlyFirstError: true }).map((item)=>{
         return {message:"If the inputModel has incorrect values",field:item.param}
     });
-    if (!errors.length) {
-        res.status(401).json({ "errorsMessages":[ ...errors] });
+    if (errors.length) {
+        res.status(401).json({ "errorsMessages":errors });
     } else{
         next()
     }
