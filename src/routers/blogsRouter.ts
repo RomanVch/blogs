@@ -27,8 +27,6 @@ blogsRouter.post('/',
    async (req, res) => {
         const {name,description,websiteUrl} = req.body
         const newPost = await blogsDbRepository.addBlog({name,description,websiteUrl})
-       console.log(newPost)
-       await blogsDbRepository.addBlog({name,description,websiteUrl});
         res.status(201).send(newPost);
     })
 
