@@ -1,22 +1,25 @@
 export type PostT = {
-    id: string,
+    id?: string,
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string
+    blogName: string,
+    createdAt:string,
 }
 
 export type BlogT = {
-     id :  string ,
+     id? :  string ,
      name :  string ,
      description :  string ,
-     websiteUrl :  string 
+     websiteUrl :  string ,
+     createdAt:string,
 }
-export type DataBaseT = {
-    blogs:BlogT[],
-    blogsIdCounter:number,
-    posts:PostT[],
-    postsIdCounter:number
+export type PostBaseT = {
+    posts:PostT[]
+}
 
+export type BlogsBaseT = {
+    blogs:BlogT[]
 }
+export type DataBaseT =  PostBaseT & BlogsBaseT

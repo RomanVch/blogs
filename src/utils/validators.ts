@@ -1,10 +1,11 @@
-import {dataBase} from "../repository/dataBase";
 import {body} from "express-validator";
-export {dataBase} from "../repository/dataBase.js"
+import {dataBase} from "../repository/dataBase";
+import {postInDbRepository} from "../repository/post-in-db-repository";
+import {blogsDbRepository} from "../repository/blogs-db-repository";
 
 export const validBodyString = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max})
-export const validBlogID = ()=> body("blogId").isString().trim().isLength({min:1,max:1000}).custom(blogId => {
-        const blog =  dataBase.blogs.find((blog)=>blog.id === blogId)
+export const validBlogID = ()=> body("blogId").isString().trim().isLength({min:1,max:1000}).custom(async blogId => {
+        const blog = await blogsDbRepository.getBlogId(blogId)
          if (!blog) throw new Error()
          return true
  })

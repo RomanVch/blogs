@@ -1,15 +1,23 @@
 import { Router } from "express";
-import { dataBase } from "../repository/dataBase";
 import { errorsValidatorMiddleware } from "../middlewares/errors-middlewares";;
-import { postRepository } from "../repository/postRepository";
+import { postInDbRepository } from "../repository/post-in-db-repository";
 import {validBlogID, validBodyString} from "../utils/validators";
 import { auth } from "../middlewares/auth";
+import {dataBase} from "../repository/dataBase";
 
-export const postRouter = Router({});
+const postRouter = Router({});
 
-postRouter.get('/', (req, res) => {
-        res.send(dataBase.posts)
+postRouter.get('/', async(req, res) => {
+    const posts = await postInDbRepository.getPosts()
+    res.send(posts)
 })
+
+postRouter.get('/:id',
+    async (req, res) => {
+        const id = req.params.id;
+        const post = await postInDbRepository.getPostId(id)
+        post ? res.send(post) : res.sendStatus(404)
+    })
 
 postRouter.post('/',
     auth,
@@ -18,18 +26,11 @@ postRouter.post('/',
     validBlogID(),
     validBodyString('title'),
     errorsValidatorMiddleware,
-    (req, res) => {
+ async (req, res) => {
     const {title,shortDescription,content,blogId} = req.body
-    const newPost = postRepository.addPost({title,shortDescription,content,blogId})
+    const newPost = await postInDbRepository.addPost({title,shortDescription,content,blogId})
         res.status(201).send(newPost);
 })
-
-postRouter.get('/:id',
-    (req, res) => {
-    const post = dataBase.posts.find((post)=>post.id === req.params.id)
-        post ? res.send(post) : res.sendStatus(404)
-})
-
 
 postRouter.put('/:id',
     auth,
@@ -37,21 +38,24 @@ postRouter.put('/:id',
     validBodyString('content',1,1000),
     validBlogID(),
     validBodyString('title'),
-    errorsValidatorMiddleware, (req, res) => {
+    errorsValidatorMiddleware,
+    async (req, res) => {
     const id = req.params.id;
     const {title,shortDescription,content,blogId} = req.body
-        const post = postRepository.correctPost({id,title,shortDescription,content,blogId})
+        const post = await postInDbRepository.correctPost({id,title,shortDescription,content,blogId})
         post ? res.sendStatus(204): res.sendStatus(404)
 })
 
 
 postRouter.delete('/:id',auth,
-    (req, res) => {
+    async (req, res) => {
     const id = req.params.id
-        const chekPost =postRepository.delPost(id)
+        const chekPost = await postInDbRepository.delPost(id)
     if(chekPost){
         res.sendStatus(204)
     } else {
          res.sendStatus(404)
         }
 })
+
+export default postRouter
