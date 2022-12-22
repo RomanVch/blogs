@@ -3,7 +3,6 @@ import { errorsValidatorMiddleware } from "../middlewares/errors-middlewares";;
 import { postInDbRepository } from "../repository/post-in-db-repository";
 import {validBlogID, validBodyString} from "../utils/validators";
 import { auth } from "../middlewares/auth";
-import {dataBase} from "../repository/dataBase";
 
 const postRouter = Router({});
 

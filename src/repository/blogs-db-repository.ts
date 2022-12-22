@@ -1,4 +1,4 @@
-import {client, dataBase} from "./dataBase";
+import {client} from "./dataBase";
 import {BlogsBaseT, BlogT, PostBaseT, PostT} from "./types";
 import {ObjectId, WithId} from "mongodb";
 import {log} from "util";

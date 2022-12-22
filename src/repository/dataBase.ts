@@ -21,8 +21,3 @@ export async function runDb(){
         await client.close()
     }
 }
-
-export const dataBase:DataBaseT = {
-    blogs:[],
-    posts:[],
-}

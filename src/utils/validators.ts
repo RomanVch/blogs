@@ -1,6 +1,4 @@
 import {body} from "express-validator";
-import {dataBase} from "../repository/dataBase";
-import {postInDbRepository} from "../repository/post-in-db-repository";
 import {blogsDbRepository} from "../repository/blogs-db-repository";
 
 export const validBodyString = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max})

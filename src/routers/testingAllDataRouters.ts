@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {client, dataBase} from "../repository/dataBase";
+import { client } from "../repository/dataBase";
 import {BlogsBaseT} from "../repository/types";
 
 export const testingAllDataRouter = Router({});
