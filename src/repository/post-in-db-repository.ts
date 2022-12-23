@@ -1,19 +1,19 @@
 import {client} from "./dataBase";
-import {PostBaseT, PostT} from "./types";
+import {PostT} from "./types";
 import {ObjectId, WithId} from "mongodb";
 
-const postDb=client.db("blogs").collection<PostBaseT>("posts");
+const postDb=client.db("blogs").collection<WithId<PostT>>("posts");
 
 export const postInDbRepository = {
-    async getPosts(): Promise<WithId<PostBaseT>[]> {
+    async getPosts(): Promise<WithId<PostT>[]> {
         const posts = await postDb.find({}).toArray();
         return posts
     },
-    async getPostId(id:string):Promise<WithId<PostBaseT>|false> {
+    async getPostId(id:string):Promise<WithId<PostT>|false> {
         const posts = await postDb.findOne({_id: new ObjectId(id)})
         return posts ? posts : false
     },
-    async addPost(newPostData:{title:string, shortDescription:string, content:string,blogId:string}): Promise<PostT>{
+    async addPost(newPostData:{title:string, shortDescription:string, content:string,blogId:string}): Promise<WithId<PostT>> {
         const {title,shortDescription,content,blogId} = newPostData
         const dateNow = new Date()
         const newPost:PostT = {
@@ -25,7 +25,7 @@ export const postInDbRepository = {
             createdAt:dateNow.toISOString()
         }
         await client.db('blogs').collection("posts").insertOne(newPost);
-        return newPost;
+        return newPost as WithId<PostT>;
     },
     async correctPost(correctPostData:{id:string,title:string, shortDescription:string, content:string,blogId:string}):Promise<boolean>{
         const {id,title,shortDescription,content}= correctPostData
