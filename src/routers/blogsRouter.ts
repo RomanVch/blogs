@@ -3,19 +3,29 @@ import {validBodyString, validUrl} from "../utils/validators";
 import {auth} from "../middlewares/auth";
 import {Router} from "express";
 import {blogsDbRepository} from "../repository/blogs-db-repository";
+import {WithId} from "mongodb";
+import {BlogT} from "../repository/types";
 
 const blogsRouter = Router({});
 
+
 blogsRouter.get('/', async (req, res) => {
     const blogs = await blogsDbRepository.getBlogs()
-    res.send(blogs);
+    res.send(blogs.map((elemID:WithId<BlogT>)=>{
+        return {id:elemID._id, name:elemID.name, description:elemID.description, websiteUrl:elemID.websiteUrl, createdAt:elemID.createdAt}
+    }));
 })
 
 blogsRouter.get('/:id',
     errorsValidatorMiddleware,
  async (req, res) => {
         const blog = await blogsDbRepository.getBlogId(req.params.id)
-        blog ? res.send(blog) : res.sendStatus(404)
+        if(blog){
+            const correctBlog={id:blog._id, name:blog.name, description:blog.description, websiteUrl:blog.websiteUrl, createdAt:blog.createdAt}
+            res.send(correctBlog)
+        } else {
+            res.sendStatus(404)
+        }
     })
 
 blogsRouter.post('/',

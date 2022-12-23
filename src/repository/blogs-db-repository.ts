@@ -1,16 +1,15 @@
 import {client} from "./dataBase";
-import {BlogsBaseT, BlogT, PostBaseT, PostT} from "./types";
+import { BlogT } from "./types";
 import {ObjectId, WithId} from "mongodb";
-import {log} from "util";
 
-const blogDb = client.db("blogs").collection<BlogsBaseT>("blogs")
+const blogDb = client.db("blogs").collection<WithId<BlogT>>("blogs")
 
 export const blogsDbRepository = {
-    async getBlogs():Promise<WithId<BlogsBaseT>[]> {
+    async getBlogs():Promise<WithId<BlogT>[]> {
         const blogs = await blogDb.find({}).toArray()
         return blogs
     },
-        async getBlogId(id:string):Promise<WithId<BlogsBaseT>|false> {
+        async getBlogId(id:string):Promise<WithId<BlogT>|false> {
         const blogs = await blogDb.findOne({_id: new ObjectId(id)})
             console.log(blogs)
             return blogs ? blogs : false
@@ -24,8 +23,14 @@ export const blogsDbRepository = {
             websiteUrl: newBlogData.websiteUrl,
             createdAt:dateNow.toISOString()
         }
-        await client.db('blogs').collection("blogs").insertOne(newBlog);
-        return newBlog;
+        const result = await client.db('blogs').collection("blogs").insertOne(newBlog);
+        return {
+            id:result.insertedId.toString(),
+            name: newBlog.name,
+            description: newBlog.description,
+            websiteUrl: newBlog.websiteUrl,
+            createdAt:newBlog.createdAt
+        };
     },
     async correctBlog(correctBlogData:{ id:string,name:string, description:string, websiteUrl:string }):Promise<boolean> {
         const {id,description,websiteUrl,name}= correctBlogData

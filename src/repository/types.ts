@@ -15,11 +15,6 @@ export type BlogT = {
      websiteUrl :  string ,
      createdAt:string,
 }
-export type PostBaseT = {
-    posts:PostT[]
-}
 
-export type BlogsBaseT = {
-    blogs:BlogT[]
-}
-export type DataBaseT =  PostBaseT & BlogsBaseT
+
+export type DataBaseT =  PostT[] & BlogT[]
