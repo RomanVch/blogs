@@ -1,31 +1,37 @@
 import {client} from "./dataBase";
-import {PostT} from "./types";
-import {ObjectId, WithId} from "mongodb";
+import {PostMongoIdT, PostT} from "./types";
+import {ObjectId} from "mongodb";
+import {PostsQueryT} from "../routers/postRouter";
+import {blogsQueryT} from "../routers/blogsRouter";
 
-const postDb=client.db("blogs").collection<WithId<PostT>>("posts");
+export const postDb=client.db("blogs").collection<PostMongoIdT>("posts");
 
 export const postInDbRepository = {
-    async getPosts(): Promise<WithId<PostT>[]> {
-        const posts = await postDb.find({}).toArray();
-        return posts
-    },
-    async getPostId(id:string):Promise<WithId<PostT>|false> {
-        const posts = await postDb.findOne({_id: new ObjectId(id)})
-        return posts ? posts : false
-    },
-    async addPost(newPostData:{title:string, shortDescription:string, content:string,blogId:string}): Promise<WithId<PostT>> {
-        const {title,shortDescription,content,blogId} = newPostData
-        const dateNow = new Date()
-        const newPost:PostT = {
-            title,
-            shortDescription,
-            content,
-            blogId,
-            blogName: newPostData.blogId + 'Name',
-            createdAt:dateNow.toISOString()
+    async getPosts(postQuery:PostsQueryT): Promise<PostMongoIdT[]> {
+        if(postQuery.pageNumber && postQuery.pageSize){
+            const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
+            return postDb.find({}).skip(skip).limit(postQuery.pageSize).toArray()
         }
-        await client.db('blogs').collection("posts").insertOne(newPost);
-        return newPost as WithId<PostT>;
+        return []
+    },
+    async getPostsBlog(blogId:string, blogsQuery:blogsQueryT):Promise<PostMongoIdT[]> {
+        if(blogsQuery.pageNumber && blogsQuery.pageSize) {
+            const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
+            return postDb.find({blogId}).skip(skip).limit(blogsQuery.pageSize).toArray();
+        }
+        return []
+        },
+    async getPostId(id:string):Promise<PostMongoIdT|null> {
+        return postDb.findOne({_id: new ObjectId(id)})
+    },
+    async addPost(newPostData:PostT): Promise<PostMongoIdT|null> {
+        const blog = await client.db('blogs').collection("blog").find({_id: newPostData.blogId});
+        console.log(blog,111111);
+        if (blog){
+            await client.db('blogs').collection("posts").insertOne(newPostData);
+            return newPostData as PostMongoIdT;
+        }
+        return null
     },
     async correctPost(correctPostData:{id:string,title:string, shortDescription:string, content:string,blogId:string}):Promise<boolean>{
         const {id,title,shortDescription,content}= correctPostData

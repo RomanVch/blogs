@@ -1,42 +1,49 @@
-import { Router } from "express";
+import {Request, Router} from "express";
 import { errorsValidatorMiddleware } from "../middlewares/errors-middlewares";;
-import { postInDbRepository } from "../repository/post-in-db-repository";
-import {validBlogID, validBodyString} from "../utils/validators";
+
+import {
+    validBlogID,
+    validBodyString,
+    validQueryNumber,
+    validQuerySortDirection,
+    validQueryString
+} from "../utils/validators";
 import { auth } from "../middlewares/auth";
 import {WithId} from "mongodb";
-import {BlogT, PostT} from "../repository/types";
+import {PostT} from "../repository/types";
+import {postService} from "../domain/post-service";
+import {mapper} from "../utils/mapper";
+
+export type PostsQueryT = {
+    sortBy?:string,
+    sortDirection?:string,
+    pageSize?:number,
+    pageNumber?:number
+}
 
 const postRouter = Router({});
 
-postRouter.get('/', async(req, res) => {
-    const posts = await postInDbRepository.getPosts()
-    res.send(posts.map((elemID:WithId<PostT>)=>{
-        return {
-            id:elemID._id,
-            title:elemID.title,
-            shortDescription:elemID.shortDescription,
-            content:elemID.content,
-            createdAt:elemID.createdAt,
-            blogId:elemID.blogId,
-            blogName:elemID.blogName
-        }
+postRouter.get('/',
+    validQueryNumber('pageSize'),
+    validQueryNumber('pageNumber'),
+    validQueryString('sortBy'),
+    validQuerySortDirection(),
+    errorsValidatorMiddleware,
+    async(req: Request<unknown,unknown,unknown,PostsQueryT>, res) => {
+        const { pageSize=10, pageNumber=1, sortBy="creatAt", sortDirection='desc'} = req.query
+        const query = {pageSize,pageNumber,sortBy,sortDirection};
+        const posts = await postService.getPosts(query)
+        res.send(posts.map((elemID:WithId<PostT>)=>{
+        return mapper.getClientPost(elemID)
     }))
 })
 
 postRouter.get('/:id',
     async (req, res) => {
         const id = req.params.id;
-        const post = await postInDbRepository.getPostId(id)
+        const post = await postService.getPostId(id)
         if (post) {
-            const correctPost = {
-                id: post._id,
-                title: post.title,
-                shortDescription: post.shortDescription,
-                content: post.content,
-                createdAt: post.createdAt,
-                blogId: post.blogId,
-                blogName: post.blogName
-            }
+            const correctPost = mapper.getClientPost(post)
             res.send(correctPost)
         } else {
             res.sendStatus(404)
@@ -52,9 +59,13 @@ postRouter.post('/',
     errorsValidatorMiddleware,
  async (req, res) => {
     const {title,shortDescription,content,blogId} = req.body
-    const newPost = await postInDbRepository.addPost({title,shortDescription,content,blogId})
-     const correctPost = {id:newPost._id, title:newPost.title, blogId:newPost.blogId, blogName:newPost.blogName, content:newPost.content, shortDescription:newPost.shortDescription, createdAt:newPost.createdAt};
-     res.status(201).send(correctPost);
+    const newPost = await postService.addPost({title,shortDescription,content,blogId})
+     if(newPost){
+         const correctPost = {id:newPost._id, title:newPost.title, blogId:newPost.blogId, blogName:newPost.blogName, content:newPost.content, shortDescription:newPost.shortDescription, createdAt:newPost.createdAt};
+         res.status(201).send(correctPost);
+     } else {
+         res.sendStatus(404)
+     }
 })
 
 postRouter.put('/:id',
@@ -67,14 +78,14 @@ postRouter.put('/:id',
     async (req, res) => {
     const id = req.params.id;
     const {title,shortDescription,content,blogId} = req.body
-        const post = await postInDbRepository.correctPost({id,title,shortDescription,content,blogId})
+        const post = await postService.correctPost({id,title,shortDescription,content,blogId})
         post ? res.sendStatus(204): res.sendStatus(404)
 })
 
 postRouter.delete('/:id',auth,
     async (req, res) => {
     const id = req.params.id
-        const chekPost = await postInDbRepository.delPost(id)
+        const chekPost = await postService.delPost(id)
     if(chekPost){
         res.sendStatus(204)
     } else {
