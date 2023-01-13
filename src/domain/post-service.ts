@@ -2,6 +2,8 @@
 import {CorrectPostT, DataForNewPostT, PostMongoIdT, PostT} from "../repository/types";
 import {postInDbRepository} from "../repository/post-in-db-repository";
 import {PostsQueryT} from "../routers/postRouter";
+import {blogsDbRepository} from "../repository/blogs-db-repository";
+import {blogsService} from "./blog-service";
 
 export const postService = {
     async getPosts(postQuery:PostsQueryT): Promise<PostMongoIdT[]> {
@@ -14,6 +16,10 @@ export const postService = {
     async addPost(newPostData:DataForNewPostT): Promise<PostMongoIdT|null> {
         const {title,shortDescription,content,blogId} = newPostData
         const dateNow = new Date()
+        console.log("catched post")
+        const blog = await blogsService.getBlogId(blogId);
+        console.log("catched post2")
+        if(!blog) return null
         const newPost:PostT = {
             title,
             shortDescription,
@@ -22,7 +28,6 @@ export const postService = {
             blogName: newPostData.blogId + 'Name',
             createdAt:dateNow.toISOString()
         }
-        console.log(newPost)
         return postInDbRepository.addPost(newPost)
     },
     async correctPost(correctPostData:CorrectPostT):Promise<boolean>{

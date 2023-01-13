@@ -1,17 +1,26 @@
 import {client} from "./dataBase";
-import {PostMongoIdT, PostT} from "./types";
+import {BlogSimpleIdT, PostMongoIdT, PostT} from "./types";
 import {ObjectId} from "mongodb";
 import {PostsQueryT} from "../routers/postRouter";
-import {BlogsQueryT} from "../routers/blogsRouter";
+import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
+import {mapper} from "../utils/mapper";
 
 export const postDb=client.db("blogs").collection<PostMongoIdT>("posts");
 
 export const postInDbRepository = {
-    async getPosts(postQuery:PostsQueryT): Promise<PostMongoIdT[]> {
-        if(postQuery.pageNumber && postQuery.pageSize){
+    async getPosts(postQuery:PostsQueryT): Promise<[]> {
+/*        if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
-            return postDb.find({}).skip(skip).limit(postQuery.pageSize).toArray()
-        }
+            const posts = await postDb.find({}).skip(skip).limit(postQuery.pageSize).toArray()
+            const postsCount = await postDb.countDocuments();
+            return {
+                pagesCount: Math.ceil(postsCount / postQuery.pageSize),
+                page: postQuery.pageNumber,
+                pageSize: postQuery.pageSize,
+                totalCount: postsCount,
+                items: posts.map((post) => mapper.getClientPost(post))
+            };
+        }*/
         return []
     },
     async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<PostMongoIdT[]> {
@@ -26,7 +35,6 @@ export const postInDbRepository = {
     },
     async addPost(newPostData:PostT): Promise<PostMongoIdT|null> {
         const blog = await client.db('blogs').collection("blog").find({_id: newPostData.blogId});
-        console.log(blog,111111);
         if (blog){
             await client.db('blogs').collection("posts").insertOne(newPostData);
             return newPostData as PostMongoIdT;
