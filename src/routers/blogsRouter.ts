@@ -51,7 +51,7 @@ blogsRouter.get('/',
 
 })
 
-blogsRouter.get('/:id/posts',
+blogsRouter.get('/:id/post',
     validQueryNumber('pageSize'),
     validQueryNumber('pageNumber'),
     validQueryString('sortBy'),
@@ -64,10 +64,10 @@ blogsRouter.get('/:id/posts',
         if(req.params.id){
             const posts = await blogsService.getBlogPosts(req.params.id,query);
             if (posts && posts.length > 0) {
-                res.send(posts.map((post:PostMongoIdT)=>mapper.getClientPost(post)))
+                res.send(posts)
             }
             else {
-                res.sendStatus(404);
+                res.sendStatus(400);
             }
         }
 
@@ -97,7 +97,7 @@ blogsRouter.post('/',
         res.status(201).send(newPost);
     })
 
-blogsRouter.post('/:id/post',
+blogsRouter.post('/:id/posts',
     auth,
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),

@@ -6,7 +6,7 @@ import {postInDbRepository} from "../repository/post-in-db-repository";
 
 export const blogsService = {
     async getBlogs(blogsQuery:BlogsQueryT):Promise<EndRouterT<BlogSimpleIdT[]>|null> {
-     return  blogsDbRepository.getBlogs(blogsQuery)
+     return blogsDbRepository.getBlogs(blogsQuery)
 
     },
     async getBlogId(id:string):Promise<BlogMongoIdT|null> {
