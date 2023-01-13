@@ -2,7 +2,7 @@ import {client} from "./dataBase";
 import {PostMongoIdT, PostT} from "./types";
 import {ObjectId} from "mongodb";
 import {PostsQueryT} from "../routers/postRouter";
-import {blogsQueryT} from "../routers/blogsRouter";
+import {BlogsQueryT} from "../routers/blogsRouter";
 
 export const postDb=client.db("blogs").collection<PostMongoIdT>("posts");
 
@@ -14,7 +14,7 @@ export const postInDbRepository = {
         }
         return []
     },
-    async getPostsBlog(blogId:string, blogsQuery:blogsQueryT):Promise<PostMongoIdT[]> {
+    async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<PostMongoIdT[]> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
             return postDb.find({blogId}).skip(skip).limit(blogsQuery.pageSize).toArray();

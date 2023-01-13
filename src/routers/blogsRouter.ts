@@ -9,12 +9,23 @@ import {
 import {auth} from "../middlewares/auth";
 import {Router} from "express";
 import { Request } from "express"
-import {BlogMongoIdT, PostMongoIdT} from "../repository/types";
+import {PostMongoIdT} from "../repository/types";
 import {blogsService} from "../domain/blog-service";
 import {mapper} from "../utils/mapper";
 import {postService} from "../domain/post-service";
 
-export type blogsQueryT = {
+export type PageInfoT = {
+    pagesCount: number,
+        page: number,
+    pageSize: number,
+    totalCount: number,
+}
+
+export type EndRouterT<T>  = PageInfoT & {
+    items: T
+}
+
+export type BlogsQueryT = {
     searchNameTerm?:string|null,
     sortBy?:string,
     sortDirection?: "asc" | "desc",
@@ -31,11 +42,13 @@ blogsRouter.get('/',
     validQueryString('searchNameTerm'),
     validQuerySortDirection(),
     errorsValidatorMiddleware,
-    async (req:Request<unknown,unknown,unknown,blogsQueryT>, res) => {
+    async (req:Request<unknown,unknown,unknown,BlogsQueryT>, res) => {
         const {pageSize=10,pageNumber=1,sortBy="creatAt",sortDirection='desc',searchNameTerm=null} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection,searchNameTerm};
         const blogs = await blogsService.getBlogs(query);
-        res.send(blogs.map((elemID:BlogMongoIdT)=>mapper.getClientBlog(elemID)));
+        if(blogs){res.send(blogs)}
+        else {res.status(404)}
+
 })
 
 blogsRouter.get('/:id/posts',
@@ -45,7 +58,7 @@ blogsRouter.get('/:id/posts',
     validQueryString('searchNameTerm'),
     validQuerySortDirection(),
     errorsValidatorMiddleware,
-    async (req:Request<{ id: string},unknown,unknown,blogsQueryT>, res) => {
+    async (req:Request<{ id: string},unknown,unknown,BlogsQueryT>, res) => {
         const {pageSize=10,pageNumber=1,sortBy="creatAt",sortDirection='desc',searchNameTerm=null} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection,searchNameTerm};
         if(req.params.id){
@@ -101,7 +114,7 @@ blogsRouter.post('/:id/post',
             res.status(201).send(correctPost);
         }else {
             console.log(1)
-            res.sendStatus(404);
+            res.sendStatus(401);
         }
     })
 

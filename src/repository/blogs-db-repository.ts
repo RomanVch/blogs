@@ -1,22 +1,31 @@
 import {client} from "./dataBase";
 import {BlogMongoIdT, BlogSimpleIdT, BlogT, CorrectBlogT} from "./types";
 import {ObjectId, WithId} from "mongodb";
-import {blogsQueryT} from "../routers/blogsRouter";
+import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
+import {mapper} from "../utils/mapper";
 
 const blogDb = client.db("blogs").collection<BlogMongoIdT>("blogs")
 
 export const blogsDbRepository = {
-    async getBlogs(blogsQuery:blogsQueryT):Promise<BlogMongoIdT[]> {
+    async getBlogs(blogsQuery:BlogsQueryT):Promise<EndRouterT<BlogSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize && blogsQuery.sortBy && blogsQuery.sortDirection){
             const skip = (blogsQuery.pageNumber -1) * blogsQuery.pageSize;
-            const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
-
-            return blogDb.find({}).skip(skip).limit(blogsQuery.pageSize)
+            const direction = blogsQuery.sortDirection === "asc"? -1 : 1;
+            const blogs = await blogDb.find({}).skip(skip).limit(blogsQuery.pageSize)
                 .sort(blogsQuery.searchNameTerm?{
                     [blogsQuery.searchNameTerm]:direction}:{
                     [blogsQuery.sortBy]:direction}).toArray()
+            const blogsCount = await blogDb.countDocuments();
+            return {
+                pagesCount: Math.ceil(blogsCount / blogsQuery.pageSize),
+                page: blogsQuery.pageNumber,
+                pageSize: blogsQuery.pageSize,
+                totalCount: blogsCount,
+                items: blogs.map((blog) => mapper.getClientBlog(blog))
+            };
         }
-        return []
+
+        return null
     },
         async getBlogId(id:string):Promise<WithId<BlogT>|null> {
         return  blogDb.findOne({_id: new ObjectId(id)})
