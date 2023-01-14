@@ -59,7 +59,7 @@ blogsRouter.get('/:id/posts',
     validQuerySortDirection(),
     errorsValidatorMiddleware,
     async (req:Request<{ id: string},unknown,unknown,BlogsQueryT>, res) => {
-        const {pageSize=10,pageNumber=1,sortBy="creatAt",sortDirection='desc',searchNameTerm=null} = req.query
+        const {pageSize=10,pageNumber=1,sortBy="createdAt",sortDirection='desc',searchNameTerm=null} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection,searchNameTerm};
         if(req.params.id){
             const posts = await blogsService.getBlogPosts(req.params.id,query);

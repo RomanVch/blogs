@@ -33,10 +33,13 @@ export const postInDbRepository = {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
             const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
             if(!blogsQuery.sortBy)return null;
-            console.log(blogId)
-            const posts = await postDb.find({blogId: blogId}).skip(skip).limit(blogsQuery.pageSize)
-                .sort({[blogsQuery.sortBy]:direction}).toArray()
-                console.log(posts)
+            const posts = await postDb
+                .find({blogId: blogId})
+                .skip(skip)
+                .limit(blogsQuery.pageSize)
+                .sort({[blogsQuery.sortBy]:direction})
+                .toArray()
+
             const postsCount = await postDb.countDocuments();
             console.log({
                 pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
