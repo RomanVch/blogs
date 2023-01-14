@@ -16,9 +16,7 @@ export const postService = {
     async addPost(newPostData:DataForNewPostT): Promise<PostMongoIdT|null> {
         const {title,shortDescription,content,blogId} = newPostData
         const dateNow = new Date()
-        console.log("catched post")
         const blog = await blogsService.getBlogId(blogId);
-        console.log("catched post2")
         if(!blog) return null
         const newPost:PostT = {
             title,

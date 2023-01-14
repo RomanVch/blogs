@@ -5,7 +5,7 @@ export const errorsValidatorMiddleware =(req:Request,res:Response,next:NextFunct
         return {message:"If the inputModel has incorrect values",field:item.param}
     });
     if (errors.length) {
-        res.status(400).json({ "errorsMessages":errors });
+        res.status(errors[0].field === 'id'?404:400).json({ "errorsMessages":errors });
     } else{
         next()
     }
