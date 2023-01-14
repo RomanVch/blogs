@@ -10,11 +10,12 @@ export const blogsDbRepository = {
     async getBlogs(blogsQuery:BlogsQueryT):Promise<EndRouterT<BlogSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize && blogsQuery.sortBy && blogsQuery.sortDirection){
             const skip = (blogsQuery.pageNumber -1) * blogsQuery.pageSize;
-            const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
-            const blogs = await blogDb.find({}).skip(skip).limit(blogsQuery.pageSize)
-                .sort(blogsQuery.searchNameTerm?{
-                    [blogsQuery.searchNameTerm]:direction}:{
-                    [blogsQuery.sortBy]:direction}).toArray()
+            const direction = blogsQuery.sortDirection === "desc"? 1 : -1;
+            if(!blogsQuery.sortDirection) return null
+
+            const regex = new RegExp(`${blogsQuery.searchNameTerm}`, "i");
+            const blogs = await blogDb.find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') }).skip(skip).limit(blogsQuery.pageSize)
+                .sort({[blogsQuery.sortBy]:direction}).toArray()
             const blogsCount = await blogDb.countDocuments();
             return {
                 pagesCount: Math.ceil(blogsCount / blogsQuery.pageSize),
