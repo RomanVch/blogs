@@ -51,7 +51,7 @@ blogsRouter.get('/',
 
 })
 
-blogsRouter.get('/:id/post',
+blogsRouter.get('/:id/posts',
     validQueryNumber('pageSize'),
     validQueryNumber('pageNumber'),
     validQueryString('sortBy'),
@@ -70,7 +70,6 @@ blogsRouter.get('/:id/post',
                 res.sendStatus(404);
             }
         }
-
     })
 
 blogsRouter.get('/:id',
