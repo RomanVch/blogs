@@ -122,7 +122,7 @@ blogsRouter.post('/:id/posts',
             const correctPost = {id:newPost._id, title:newPost.title, blogId:newPost.blogId, blogName:newPost.blogName, content:newPost.content, shortDescription:newPost.shortDescription, createdAt:newPost.createdAt};
             res.status(201).send(correctPost);
         }else {
-            res.sendStatus(404);
+            res.sendStatus(401);
         }
     })
 
