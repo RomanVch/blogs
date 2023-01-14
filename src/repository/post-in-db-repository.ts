@@ -11,7 +11,12 @@ export const postInDbRepository = {
     async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
        if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
-            const posts = await postDb.find({}).skip(skip).limit(postQuery.pageSize).toArray()
+            const direction = postQuery.sortDirection === "asc"? 1 : -1;
+            if(!postQuery.sortBy)return null;
+
+            const posts = await postDb.find({}).skip(skip).limit(postQuery.pageSize)
+                .sort({[postQuery.sortBy]:direction}).toArray()
+
             const postsCount = await postDb.countDocuments();
             return {
                 pagesCount: Math.ceil(postsCount / postQuery.pageSize),

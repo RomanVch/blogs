@@ -67,7 +67,7 @@ blogsRouter.get('/:id/post',
                 res.send(posts)
             }
             else {
-                res.sendStatus(400);
+                res.sendStatus(404);
             }
         }
 

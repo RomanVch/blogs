@@ -10,7 +10,7 @@ export const blogsDbRepository = {
     async getBlogs(blogsQuery:BlogsQueryT):Promise<EndRouterT<BlogSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize && blogsQuery.sortBy && blogsQuery.sortDirection){
             const skip = (blogsQuery.pageNumber -1) * blogsQuery.pageSize;
-            const direction = blogsQuery.sortDirection === "asc"? -1 : 1;
+            const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
             const blogs = await blogDb.find({}).skip(skip).limit(blogsQuery.pageSize)
                 .sort(blogsQuery.searchNameTerm?{
                     [blogsQuery.searchNameTerm]:direction}:{
