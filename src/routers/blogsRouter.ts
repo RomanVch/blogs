@@ -1,6 +1,6 @@
 import {errorsValidatorMiddleware} from "../middlewares/errors-middlewares";
 import {
-    validBodyString,
+    validBodyString, validParamBlogID,
     validQueryNumber,
     validQuerySortDirection,
     validQueryString,
@@ -102,6 +102,7 @@ blogsRouter.post('/:id/posts',
     validBodyString('shortDescription',1,100),
     validBodyString('content',1,1000),
     validBodyString('title'),
+    validParamBlogID(),
     errorsValidatorMiddleware,
     async (req, res) => {
     const {title,shortDescription,content} = req.body

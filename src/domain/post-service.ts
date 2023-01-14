@@ -1,14 +1,14 @@
 
-import {CorrectPostT, DataForNewPostT, PostMongoIdT, PostT} from "../repository/types";
+import {BlogSimpleIdT, CorrectPostT, DataForNewPostT, PostMongoIdT, PostSimpleIdT, PostT} from "../repository/types";
 import {postInDbRepository} from "../repository/post-in-db-repository";
 import {PostsQueryT} from "../routers/postRouter";
 import {blogsDbRepository} from "../repository/blogs-db-repository";
 import {blogsService} from "./blog-service";
+import {EndRouterT} from "../routers/blogsRouter";
 
 export const postService = {
-    async getPosts(postQuery:PostsQueryT): Promise<PostMongoIdT[]> {
-       return postInDbRepository.getPosts(postQuery)
-
+    async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
+        return postInDbRepository.getPosts(postQuery)
     },
     async getPostId(id:string):Promise<PostMongoIdT|null> {
         return postInDbRepository.getPostId(id)

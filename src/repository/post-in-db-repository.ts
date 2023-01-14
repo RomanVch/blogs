@@ -1,5 +1,5 @@
 import {client} from "./dataBase";
-import {BlogSimpleIdT, PostMongoIdT, PostT} from "./types";
+import {BlogSimpleIdT, PostMongoIdT, PostSimpleIdT, PostT} from "./types";
 import {ObjectId} from "mongodb";
 import {PostsQueryT} from "../routers/postRouter";
 import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
@@ -8,8 +8,8 @@ import {mapper} from "../utils/mapper";
 export const postDb=client.db("blogs").collection<PostMongoIdT>("posts");
 
 export const postInDbRepository = {
-    async getPosts(postQuery:PostsQueryT): Promise<[]> {
-/*        if(postQuery.pageNumber && postQuery.pageSize){
+    async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
+       if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
             const posts = await postDb.find({}).skip(skip).limit(postQuery.pageSize).toArray()
             const postsCount = await postDb.countDocuments();
@@ -20,8 +20,8 @@ export const postInDbRepository = {
                 totalCount: postsCount,
                 items: posts.map((post) => mapper.getClientPost(post))
             };
-        }*/
-        return []
+        }
+        return null
     },
     async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<PostMongoIdT[]> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
@@ -34,12 +34,8 @@ export const postInDbRepository = {
         return postDb.findOne({_id: new ObjectId(id)})
     },
     async addPost(newPostData:PostT): Promise<PostMongoIdT|null> {
-        const blog = await client.db('blogs').collection("blog").find({_id: newPostData.blogId});
-        if (blog){
             await client.db('blogs').collection("posts").insertOne(newPostData);
             return newPostData as PostMongoIdT;
-        }
-        return null
     },
     async correctPost(correctPostData:{id:string,title:string, shortDescription:string, content:string,blogId:string}):Promise<boolean>{
         const {id,title,shortDescription,content}= correctPostData

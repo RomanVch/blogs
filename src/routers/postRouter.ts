@@ -9,8 +9,6 @@ import {
     validQueryString
 } from "../utils/validators";
 import { auth } from "../middlewares/auth";
-import {WithId} from "mongodb";
-import {PostT} from "../repository/types";
 import {postService} from "../domain/post-service";
 import {mapper} from "../utils/mapper";
 
@@ -33,9 +31,8 @@ postRouter.get('/',
         const { pageSize=10, pageNumber=1, sortBy="creatAt", sortDirection='desc'} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection};
         const posts = await postService.getPosts(query)
-        res.send(posts.map((elemID:WithId<PostT>)=>{
-        return mapper.getClientPost(elemID)
-    }))
+        if(!posts)  return res.sendStatus(404);
+        res.send(posts)
 })
 
 postRouter.get('/:id',
