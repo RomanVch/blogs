@@ -1,4 +1,4 @@
-import {BlogMongoIdT, BlogSimpleIdT, BlogT, CorrectBlogT, PostMongoIdT} from "../repository/types";
+import {BlogMongoIdT, BlogSimpleIdT, BlogT, CorrectBlogT, PostMongoIdT, PostSimpleIdT} from "../repository/types";
 import {blogsDbRepository} from "../repository/blogs-db-repository";
 import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
 import {postInDbRepository} from "../repository/post-in-db-repository";
@@ -12,7 +12,7 @@ export const blogsService = {
     async getBlogId(id:string):Promise<BlogMongoIdT|null> {
         return blogsDbRepository.getBlogId(id)
     },
-    async getBlogPosts(blogId:string,blogsQuery:BlogsQueryT):Promise<PostMongoIdT[]|null> {
+    async getBlogPosts(blogId:string,blogsQuery:BlogsQueryT):Promise<EndRouterT<PostSimpleIdT[]>|null> {
         return postInDbRepository.getPostsBlog(blogId,blogsQuery)
     },
     async addBlog(newBlogData:{name:string, description:string, websiteUrl:string}): Promise<BlogSimpleIdT>{
