@@ -28,12 +28,32 @@ export const postInDbRepository = {
         }
         return null
     },
-    async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<PostMongoIdT[]> {
+    async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<EndRouterT<PostSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
-            return postDb.find({blogId}).skip(skip).limit(blogsQuery.pageSize).toArray();
+            const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
+            if(!blogsQuery.sortBy)return null;
+            console.log(blogId)
+            const posts = await postDb.find({blogId: blogId}).skip(skip).limit(blogsQuery.pageSize)
+                .sort({[blogsQuery.sortBy]:direction}).toArray()
+                console.log(posts)
+            const postsCount = await postDb.countDocuments();
+            console.log({
+                pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
+                page: blogsQuery.pageNumber,
+                pageSize: blogsQuery.pageSize,
+                totalCount: postsCount,
+                items: posts.map((post) => mapper.getClientPost(post))
+            })
+            return {
+                pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
+                page: blogsQuery.pageNumber,
+                pageSize: blogsQuery.pageSize,
+                totalCount: postsCount,
+                items: posts.map((post) => mapper.getClientPost(post))
+            };
         }
-        return []
+        return null
         },
     async getPostId(id:string):Promise<PostMongoIdT|null> {
         return postDb.findOne({_id: new ObjectId(id)})
