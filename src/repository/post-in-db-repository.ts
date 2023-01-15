@@ -11,13 +11,16 @@ export const postInDbRepository = {
     async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
        if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
-            const direction = postQuery.sortDirection === "asc"? 1 : -1;
+            const direction = postQuery.sortDirection === "desc"? -1 : 1;
             if(!postQuery.sortBy)return null;
 
-            const posts = await postDb.find({}).skip(skip).limit(postQuery.pageSize)
-                .sort({[postQuery.sortBy]:direction}).toArray()
+            const posts = await postDb.find({})
+                .skip(skip)
+                .limit(postQuery.pageSize)
+                .sort({[postQuery.sortBy]:direction})
+                .toArray()
 
-            const postsCount = await postDb.countDocuments();
+            const postsCount = await postDb.estimatedDocumentCount();
             return {
                 pagesCount: Math.ceil(postsCount / postQuery.pageSize),
                 page: postQuery.pageNumber,
@@ -41,13 +44,6 @@ export const postInDbRepository = {
                 .toArray()
 
             const postsCount = await postDb.countDocuments();
-            console.log({
-                pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
-                page: blogsQuery.pageNumber,
-                pageSize: blogsQuery.pageSize,
-                totalCount: postsCount,
-                items: posts.map((post) => mapper.getClientPost(post))
-            })
             return {
                 pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
