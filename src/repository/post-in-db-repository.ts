@@ -31,7 +31,7 @@ export const postInDbRepository = {
     async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<EndRouterT<PostSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
-            const direction = blogsQuery.sortDirection === "asc"? 1 : -1;
+            const direction = blogsQuery.sortDirection === "desc"? -1 : 1;
             if(!blogsQuery.sortBy)return null;
             const posts = await postDb
                 .find({blogId: blogId})
