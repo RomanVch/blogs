@@ -43,7 +43,7 @@ export const postInDbRepository = {
                 .sort({[blogsQuery.sortBy]:direction})
                 .toArray()
 
-            const postsCount = await postDb.countDocuments();
+            const postsCount = await postDb.countDocuments() - 1;
             return {
                 pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
