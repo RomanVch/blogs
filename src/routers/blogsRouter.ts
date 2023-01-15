@@ -63,7 +63,7 @@ blogsRouter.get('/:id/posts',
         const query = {pageSize,pageNumber,sortBy,sortDirection,searchNameTerm};
         if(req.params.id){
             const posts = await blogsService.getBlogPosts(req.params.id,query);
-            if (posts) {
+            if (posts && posts.items.length > 0) {
                 res.send(posts)
             }
             else {
