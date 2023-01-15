@@ -28,7 +28,7 @@ postRouter.get('/',
     validQuerySortDirection(),
     errorsValidatorMiddleware,
     async(req: Request<unknown,unknown,unknown,PostsQueryT>, res) => {
-        const { pageSize=10, pageNumber=1, sortBy="creatAt", sortDirection='desc'} = req.query
+        const { pageSize=10, pageNumber=1, sortBy="createdAt", sortDirection='desc'} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection};
         const posts = await postService.getPosts(query)
         if(!posts)  return res.sendStatus(404);
