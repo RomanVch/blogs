@@ -12,7 +12,6 @@ export const blogsDbRepository = {
             const skip = (blogsQuery.pageNumber -1) * blogsQuery.pageSize;
             const direction = blogsQuery.sortDirection === "desc"? -1 : 1;
             if(!blogsQuery.sortDirection) return null
-            console.log({[blogsQuery.sortBy]:direction})
             const regex = new RegExp(`${blogsQuery.searchNameTerm}`, "i");
             const blogs = await blogDb
                 .find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') })
@@ -20,7 +19,7 @@ export const blogsDbRepository = {
                 .limit(blogsQuery.pageSize)
                 .sort({[blogsQuery.sortBy]:direction})
                 .toArray()
-            const blogsCount = await blogDb.countDocuments();
+            const blogsCount = await blogDb.find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') }).count();
             return {
                 pagesCount: Math.ceil(blogsCount / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
