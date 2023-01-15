@@ -43,12 +43,13 @@ export const postInDbRepository = {
                 .sort({[blogsQuery.sortBy]:direction})
                 .toArray()
 
-            const postsCount = await postDb.countDocuments() - 1;
+            const postsCount = await postDb.countDocuments();
+            console.log(postsCount - 1);
             return {
                 pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
                 pageSize: blogsQuery.pageSize,
-                totalCount: postsCount,
+                totalCount: postsCount - 1,
                 items: posts.map((post) => mapper.getClientPost(post))
             };
         }
