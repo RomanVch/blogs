@@ -35,7 +35,7 @@ export const postInDbRepository = {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
             console.log(blogsQuery.sortDirection);
-            const direction = blogsQuery.sortDirection === "desc"? 1 : -1;
+            const direction = blogsQuery.sortDirection === "desc"? -1 : 1;
             if(!blogsQuery.sortBy)return null;
             const posts = await postDb
                 .find({blogId: blogId})

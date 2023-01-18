@@ -12,7 +12,7 @@ export const usersDbRepository = {
         if(usersQuery.pageNumber && usersQuery.pageSize && usersQuery.sortBy){
             const skip = (usersQuery.pageNumber -1) * usersQuery.pageSize;
             console.log(usersQuery.sortDirection,"================================================================")
-            const direction = usersQuery.sortDirection === "desc"? 1 : -1;
+            const direction = usersQuery.sortDirection === "desc"? -1 : 1;
             const getRegex = (name:string|undefined|null) => {
                 if(name){
                     return new RegExp(`${name}`, "i")}
