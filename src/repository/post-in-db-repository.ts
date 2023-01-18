@@ -44,9 +44,8 @@ export const postInDbRepository = {
                 .toArray()
 
             const postsCount = await postDb.countDocuments();
-            console.log(postsCount - 1);
             return {
-                pagesCount: Math.ceil(postsCount / blogsQuery.pageSize),
+                pagesCount: Math.ceil(postsCount - 1 / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
                 pageSize: blogsQuery.pageSize,
                 totalCount: postsCount - 1,

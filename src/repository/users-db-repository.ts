@@ -15,7 +15,7 @@ export const usersDbRepository = {
             const getRegex = (name:string|undefined|null) => {
                 if(name){
                     return new RegExp(`${name}`, "i")}
-                return ""
+                return new RegExp(``, "i")
                 }
             const users = await usersDb
                 .find({$or: [{login: getRegex(usersQuery.searchLoginTerm)}, {email: getRegex(usersQuery.searchEmailTerm )}]})
@@ -27,6 +27,7 @@ export const usersDbRepository = {
                 .find({$or: [{login: getRegex(usersQuery.searchLoginTerm)}, {email: getRegex(usersQuery.searchEmailTerm )}]})
                 .count();
 
+            console.log(users,blogsCount)
             return {
                 pagesCount: Math.ceil(blogsCount / usersQuery.pageSize),
                 page: usersQuery.pageNumber,

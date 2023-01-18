@@ -104,17 +104,6 @@ blogsRouter.post('/:id/posts',
     errorsValidatorMiddleware,
     async (req, res) => {
     const {title,shortDescription,content} = req.body
-        /*console.log(!req.params.id)*/
-/*if(!req.params.id?.trim()){
-            console.log("CATCH")
-            return res.status(400).send({
-            errorsMessages: [
-                {
-                    message: "blogId is required",
-                    field: "param blogId"
-                }
-            ]
-        });}*/
         const newPost = await postService.addPost({title,shortDescription,content,blogId:req.params.id})
         if(newPost){
             const correctPost = {id:newPost._id, title:newPost.title, blogId:newPost.blogId, blogName:newPost.blogName, content:newPost.content, shortDescription:newPost.shortDescription, createdAt:newPost.createdAt};
