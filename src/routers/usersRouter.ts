@@ -32,8 +32,8 @@ usersRouter.get('/',
     validQuerySortDirection(),
     errorsValidatorMiddleware,
     async (req:Request<unknown,unknown,unknown,UsersQueryT>, res) => {
-        const {pageSize=10,pageNumber=1,sortBy="createdAt",searchLoginTerm=null,searchEmailTerm=null} = req.query
-        const query = {pageSize,pageNumber,sortBy,searchLoginTerm,searchEmailTerm};
+        const {pageSize=10,pageNumber=1,sortBy="createdAt",searchLoginTerm=null,searchEmailTerm=null,sortDirection='desc'} = req.query
+        const query = {pageSize,pageNumber,sortBy,searchLoginTerm,searchEmailTerm,sortDirection};
         const users = await usersService.getUsers(query);
         if (users) {res.send(users)}
         else {res.status(404).send("Not found")}
