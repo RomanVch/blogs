@@ -41,8 +41,8 @@ usersRouter.get('/',
 
 usersRouter.post('/',
     auth,
-    validBodyLogin('login',1,500,'notHave'),
-    validBodyString('password',1,15),
+    validBodyLogin('login',3,10,'notHave'),
+    validBodyString('password',6,20),
     validBodyEmail('email',1,100),
     errorsValidatorMiddleware,
     async (req, res) => {

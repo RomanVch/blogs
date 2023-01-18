@@ -11,3 +11,11 @@ export const errorsValidatorMiddleware =(req:Request,res:Response,next:NextFunct
     }
 }
 ///
+export const errorsValidatorAuthMiddleware =(req:Request,res:Response,next:NextFunction) =>{
+    const errors = validationResult(req).array({ onlyFirstError: true }).length > 0 ? {message:"If the inputModel has incorrect values",field:"loginOrEmail | password",} :''
+    if (errors) {
+        res.status(401).json({ "errorsMessages":errors });
+    } else{
+        next()
+    }
+}

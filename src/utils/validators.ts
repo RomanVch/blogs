@@ -38,3 +38,13 @@ export const validBodyLogin = (field:string,min:number=1,max:number=30,howCheckL
     if (howCheckLogin === "have"?!loginCheck:loginCheck) throw new Error()
     return loginCheck
 })
+
+export const validLoginOrEmail = (min:number=1,max:number=30,howCheckLogin:"have"|"notHave")=> {
+    const loginOrEmail = body('loginOrEmail').isString().trim().isLength({min,max}).custom(async (login:string)=>{
+        const loginCheck = await usersDbRepository.getUserLogin(login)
+        if (howCheckLogin === "have"?!loginCheck:loginCheck) throw new Error()
+        return loginCheck
+})
+    console.log(loginOrEmail,"================================");
+    return loginOrEmail;
+}
