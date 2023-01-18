@@ -28,11 +28,10 @@ export const blogsDbRepository = {
                 items: blogs.map((blog) => mapper.getClientBlog(blog))
             };
         }
-
         return null
     },
         async getBlogId(id:string):Promise<WithId<BlogT>|null> {
-        return  blogDb.findOne({_id: new ObjectId(id)})
+            return  blogDb.findOne({_id: new ObjectId(id)})
     },
     async addBlog(newBlog:BlogT): Promise<BlogSimpleIdT>{
         const result = await client.db('blogs').collection("blogs").insertOne(newBlog);

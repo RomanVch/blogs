@@ -9,7 +9,6 @@ import {
 import {auth} from "../middlewares/auth";
 import {Router} from "express";
 import { Request } from "express"
-import {PostMongoIdT} from "../repository/types";
 import {blogsService} from "../domain/blog-service";
 import {mapper} from "../utils/mapper";
 import {postService} from "../domain/post-service";

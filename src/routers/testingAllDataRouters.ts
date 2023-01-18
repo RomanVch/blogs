@@ -1,15 +1,17 @@
 import { Router } from "express";
 import { client } from "../repository/dataBase";
-import {BlogT,PostT} from "../repository/types";
+import {BlogT, PostT, UserMongoIdT} from "../repository/types";
 
 export const testingAllDataRouter = Router({});
 
 const blogDb = client.db("blogs").collection<BlogT[]>("blogs")
 const postDb = client.db("blogs").collection<PostT[]>("posts")
+const usersDb = client.db("blogs").collection<UserMongoIdT[]>("users")
 
 testingAllDataRouter.delete('/',
     async (req, res) => {
                await blogDb.deleteMany({})
                await postDb.deleteMany({})
+               await usersDb.deleteMany({})
                 res.sendStatus(204)
     })
