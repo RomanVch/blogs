@@ -11,7 +11,7 @@ export const usersDbRepository = {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
         if(usersQuery.pageNumber && usersQuery.pageSize && usersQuery.sortBy){
             const skip = (usersQuery.pageNumber -1) * usersQuery.pageSize;
-            const direction = usersQuery.sortDirection === "desc"? -1 : 1;
+            const direction = usersQuery.sortDirection === "desc"? 1 : -1;
             const getRegex = (name:string|undefined|null) => {
                 if(name){
                     return new RegExp(`${name}`, "i")}
@@ -27,7 +27,6 @@ export const usersDbRepository = {
                 .find({$or: [{login: getRegex(usersQuery.searchLoginTerm)}, {email: getRegex(usersQuery.searchEmailTerm )}]})
                 .count();
 
-            console.log(users,blogsCount)
             return {
                 pagesCount: Math.ceil(blogsCount / usersQuery.pageSize),
                 page: usersQuery.pageNumber,
