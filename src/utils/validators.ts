@@ -6,7 +6,7 @@ import {postService} from "../domain/post-service";
 import {commentsService} from "../domain/comments-service";
 
 export const validBodyString = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max})
-export const validQueryString = (field:string)=> {
+export const validQueryString = (field:string) => {
     return query(field).optional().isString().trim()
 }
 export const validQueryNumber = (field:string)=> {

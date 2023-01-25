@@ -12,7 +12,6 @@ export const commentsService = {
             return commentsDbRepository.getCommentById(commentId)
 },
     async addComment(user:UserSimpleIdT,content:string, postId:string): Promise<CommentSimpleIdT> {
-        const dateNow = new Date()
         const newComment = mapper.getNewComment(user, content, postId)
         return await commentsDbRepository.addComments(newComment)
     },

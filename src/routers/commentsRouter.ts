@@ -20,7 +20,7 @@ commentsRouter.get('/:id',
 
 commentsRouter.put('/:id',
     authJwt,
-    validBodyString('content',1,1000),
+    validBodyString('content',20,300),
     validParamCommentId(),
     errorsValidatorMiddleware,
     async (req, res) => {

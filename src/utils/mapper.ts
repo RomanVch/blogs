@@ -51,7 +51,7 @@ export const mapper = {
     }),
 
     getSimpleComment:(comment:NewCommentT,id:ObjectId):CommentSimpleIdT=>({
-      id:id.toString(),
+        id:id.toString(),
         content:comment.content,
         commentatorInfo: {
             userId: comment.commentatorInfo.userId,
