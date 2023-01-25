@@ -73,7 +73,7 @@ blogsRouter.get('/:id/posts',
 
 blogsRouter.get('/:id',
     errorsValidatorMiddleware,
- async (req, res) => {
+    async (req, res) => {
         const blog = await blogsService.getBlogId(req.params.id)
         if(blog){
             const correctBlog = mapper.getClientBlog(blog)
