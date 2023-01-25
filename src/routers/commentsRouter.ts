@@ -35,11 +35,18 @@ commentsRouter.delete('/:id',
     errorsValidatorMiddleware,
     async (req, res) => {
         const id = req.params.id
-        const checkComment = await commentsService.deleteCommentById(id)
-        if (checkComment) {
-            res.sendStatus(204)
+        const comment = await commentsService.getCommentById(id)
+        const user = req.user
+        if(user && comment && comment.commentatorInfo.userId === user.id){
+            const checkComment = await commentsService.deleteCommentById(id)
+            if (checkComment) {
+                res.sendStatus(204)
+            } else {
+                res.sendStatus(404)
+            }
         } else {
-            res.sendStatus(404)
+            res.sendStatus(403)
         }
+
     })
 

@@ -120,8 +120,8 @@ postRouter.put('/:id',
 postRouter.delete('/:id',auth,
     async (req, res) => {
     const id = req.params.id
-        const chekPost = await postService.delPost(id)
-    if(chekPost){
+        const checkPost = await postService.delPost(id)
+    if(checkPost){
         res.sendStatus(204)
     } else {
          res.sendStatus(404)
