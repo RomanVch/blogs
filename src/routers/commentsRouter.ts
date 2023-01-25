@@ -32,7 +32,7 @@ commentsRouter.put('/:id',
             const commentCheck = await commentsService.correctComment(id,content)
             commentCheck ? res.sendStatus(204): res.sendStatus(404)
         }else {
-            return res.sendStatus(403)  
+            return res.sendStatus(403)
         }
 
     })
