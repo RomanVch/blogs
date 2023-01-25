@@ -25,9 +25,16 @@ commentsRouter.put('/:id',
     errorsValidatorMiddleware,
     async (req, res) => {
         const id = req.params.id;
+        const comment = await commentsService.getCommentById(id)
+        const user = req.user
         const {content} = req.body
-        const commentCheck = await commentsService.correctComment(id,content)
-        commentCheck ? res.sendStatus(204): res.sendStatus(404)
+        if(user && comment && comment.commentatorInfo.userId === user.id){
+            const commentCheck = await commentsService.correctComment(id,content)
+            commentCheck ? res.sendStatus(204): res.sendStatus(404)
+        }else {
+            return res.sendStatus(403)  
+        }
+
     })
 commentsRouter.delete('/:id',
     authJwt,
