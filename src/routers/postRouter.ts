@@ -1,16 +1,20 @@
 import {Request, Router} from "express";
-import { errorsValidatorMiddleware } from "../middlewares/errors-middlewares";;
-
+import {errorsValidatorMiddleware} from "../middlewares/errors-middlewares";
 import {
     validBlogID,
     validBodyString,
+    validParamPostId,
     validQueryNumber,
     validQuerySortDirection,
     validQueryString
 } from "../utils/validators";
-import { auth } from "../middlewares/auth";
+import {auth} from "../middlewares/auth";
 import {postService} from "../domain/post-service";
 import {mapper} from "../utils/mapper";
+import {commentsService} from "../domain/comments-service";
+import {authJwt} from "../middlewares/authJwt";
+import {usersService} from "../domain/users-service";
+import {ObjectId} from "mongodb";
 
 export type PostsQueryT = {
     sortBy?:string,
@@ -47,6 +51,26 @@ postRouter.get('/:id',
         }
     })
 
+postRouter.get('/:id/comments',
+    validQueryNumber('pageSize'),
+    validQueryNumber('pageNumber'),
+    validQueryString('sortBy'),
+    validQueryString('searchNameTerm'),
+    validQuerySortDirection(),
+    errorsValidatorMiddleware,
+    async (req:Request<{ id: string},unknown,unknown,PostsQueryT>, res) => {
+        const {pageSize=10,pageNumber=1,sortBy="createdAt",sortDirection='desc'} = req.query
+        const query = {pageSize,pageNumber,sortBy,sortDirection};
+        if(req.params.id){
+            const comments = await commentsService.getPostComments(req.params.id,query);
+            if (comments && comments.items.length > 0) {
+                res.send(comments)
+            }
+            else {
+                res.sendStatus(404);
+            }
+        }
+    })
 postRouter.post('/',
     auth,
     validBodyString('shortDescription',1,100),
@@ -64,7 +88,21 @@ postRouter.post('/',
          res.sendStatus(404)
      }
 })
-
+postRouter.post('/:id/comments',
+    authJwt,
+    validBodyString('content'),
+    validParamPostId(),
+    errorsValidatorMiddleware,
+    async (req, res) => {
+        const {content} = req.body
+        const user = await usersService.getUserById(new ObjectId(req.user!.id))
+        if (user) {
+            const newComment = await commentsService.addComment(user,content,req.params.id);
+            res.status(201).send(newComment);
+        } else {
+            res.sendStatus(401);
+        }
+    })
 postRouter.put('/:id',
     auth,
     validBodyString('shortDescription',1,100),

@@ -2,6 +2,8 @@ import {body, param, query} from "express-validator";
 import {blogsDbRepository} from "../repository/blogs-db-repository";
 import {usersDbRepository} from "../repository/users-db-repository";
 import {blogsService} from "../domain/blog-service";
+import {postService} from "../domain/post-service";
+import {commentsService} from "../domain/comments-service";
 
 export const validBodyString = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max})
 export const validQueryString = (field:string)=> {
@@ -25,6 +27,17 @@ export const validParamBlogID = ()=> param('id').isString().trim().isLength({min
     if (!blog) throw new Error()
     return true
 })
+
+export const validParamPostId = ()=> param('id').isString().trim().isLength({min:1,max:1000}).custom(async postId => {
+    const post = await postService.getPostId(postId);
+    if (!post) throw new Error()
+    return true
+})
+export const validParamCommentId = ()=> param('id').isString().trim().isLength({min:1,max:1000}).custom(async commentId => {
+    const comment = await commentsService.getCommentById(commentId);
+    if (!comment) throw new Error()
+    return true
+})
 export const validUrl = (field:string,min:number=1,max:number=30,RegExp:RegExp)=> body(field).isString().trim().isLength({min,max}).matches(RegExp)
 
 export const validBodyEmail = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max}).isEmail().custom(async (email:string)=>{
@@ -45,6 +58,5 @@ export const validLoginOrEmail = (min:number=1,max:number=30,howCheckLogin:"have
         if (howCheckLogin === "have"?!loginCheck:loginCheck) throw new Error()
         return loginCheck
 })
-    console.log(loginOrEmail,"================================");
     return loginOrEmail;
 }

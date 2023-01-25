@@ -105,10 +105,10 @@ blogsRouter.post('/:id/posts',
     async (req, res) => {
     const {title,shortDescription,content} = req.body
         const newPost = await postService.addPost({title,shortDescription,content,blogId:req.params.id})
-        if(newPost){
+        if (newPost) {
             const correctPost = {id:newPost._id, title:newPost.title, blogId:newPost.blogId, blogName:newPost.blogName, content:newPost.content, shortDescription:newPost.shortDescription, createdAt:newPost.createdAt};
             res.status(201).send(correctPost);
-        }else {
+        } else {
             res.sendStatus(401);
         }
     })

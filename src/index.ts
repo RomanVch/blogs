@@ -6,6 +6,7 @@ import {testingAllDataRouter} from "./routers/testingAllDataRouters";
 import {runDb} from "./repository/dataBase";
 import usersRouter from "./routers/usersRouter";
 import {authRouter} from "./routers/authRouter";
+import {commentsRouter} from "./routers/commentsRouter";
 
 export const app = express()
 const port = 3003
@@ -17,6 +18,7 @@ app.use(parserMiddleware)
     .use("/blogs", blogsRouter)
     .use("/users", usersRouter)
     .use("/auth", authRouter)
+    .use("/comments", commentsRouter)
     .use("/testing/all-data",testingAllDataRouter)
 
 

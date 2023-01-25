@@ -1,5 +1,5 @@
 import {client} from "./dataBase";
-import {BlogSimpleIdT, PostMongoIdT, PostSimpleIdT, PostT} from "./types";
+import {PostMongoIdT, PostSimpleIdT, PostT} from "./types";
 import {ObjectId} from "mongodb";
 import {PostsQueryT} from "../routers/postRouter";
 import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
@@ -9,7 +9,7 @@ export const postDb=client.db("blogs").collection<PostMongoIdT>("posts");
 
 export const postInDbRepository = {
     async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
-       if(postQuery.pageNumber && postQuery.pageSize){
+        if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
             const direction = postQuery.sortDirection === "desc"? -1 : 1;
             if(!postQuery.sortBy)return null;
@@ -34,7 +34,6 @@ export const postInDbRepository = {
     async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<EndRouterT<PostSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
-            console.log(blogsQuery.sortDirection);
             const direction = blogsQuery.sortDirection === "desc"? -1 : 1;
             if(!blogsQuery.sortBy)return null;
             const posts = await postDb
@@ -45,7 +44,6 @@ export const postInDbRepository = {
                 .toArray()
 
             const postsCount = await postDb.countDocuments();
-            console.log(postsCount)
             return {
                 pagesCount: Math.ceil((postsCount - 1) / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,

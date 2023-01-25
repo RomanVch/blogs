@@ -44,8 +44,8 @@ export const blogsDbRepository = {
         };
     },
     async correctBlog(correctBlog:CorrectBlogT):Promise<boolean> {
-        const {id,description,websiteUrl,name}= correctBlog
-        const blog = await blogDb.updateOne({_id:new ObjectId(id)},{$set: {name,description,websiteUrl}})
+        const {id,description,websiteUrl,name}= correctBlog;
+        const blog = await blogDb.updateOne({_id:new ObjectId(id)},{$set: {name,description,websiteUrl}});
         return blog.matchedCount === 1;
     },
     async delBlog(id:string){

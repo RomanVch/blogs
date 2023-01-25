@@ -1,9 +1,9 @@
-import { client } from "./dataBase";
-import { UserForBaseIdT, UserMongoIdT, UserSimpleIdT } from "./types";
-import { EndRouterT } from "../routers/blogsRouter";
-import { mapper } from "../utils/mapper";
-import { UsersQueryT } from "../routers/usersRouter";
-import { ObjectId } from "mongodb";
+import {client} from "./dataBase";
+import {UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "./types";
+import {EndRouterT} from "../routers/blogsRouter";
+import {mapper} from "../utils/mapper";
+import {UsersQueryT} from "../routers/usersRouter";
+import {ObjectId} from "mongodb";
 
 const usersDb = client.db("blogs").collection<UserMongoIdT>("users")
 
@@ -11,7 +11,6 @@ export const usersDbRepository = {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
         if(usersQuery.pageNumber && usersQuery.pageSize && usersQuery.sortBy){
             const skip = (usersQuery.pageNumber -1) * usersQuery.pageSize;
-            console.log(usersQuery.sortDirection,"================================================================")
             const direction = usersQuery.sortDirection === "desc"? -1 : 1;
             const getRegex = (name:string|undefined|null) => {
                 if(name){
@@ -38,6 +37,9 @@ export const usersDbRepository = {
         }
 
         return null
+    },
+    async getUserById(id:ObjectId){
+        return usersDb.findOne({_id: id})
     },
     async getUserLogin(login:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({login})
