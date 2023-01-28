@@ -23,7 +23,7 @@ export const authService = {
             return {code:200}
         } else {return {code:400,body:[{message:'not confirmed',field:'code'}]}}
             },
-    
+
     async resendingRegistrationEmail (email:string): Promise<MessageForResT<BodyForMessageT>>{
         const user = await usersDbRepository.getUserEmail(email)
         if(!user){ return {code:400,body: [{message:'not found',field:'email'}]}}
