@@ -63,7 +63,7 @@ authRouter.post('/registration',
     })
 
 authRouter.post('/registration-confirmation',
-    validBodyString("code"),
+    validBodyString("code",8,100),
     errorsValidatorMiddleware,
     async (req, res) => {
         const {code} = req.body
