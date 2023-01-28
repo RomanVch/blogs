@@ -6,6 +6,7 @@ const messages = {
           <a href=https://somesite.com/confirm-email?code=${code}>complete registration</a>
       </p>`}
 }
+
 const subjects = {
     confirmRegistration:'Confirm Registration'
 }
