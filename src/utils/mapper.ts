@@ -11,7 +11,6 @@ import {
 } from "../repository/types";
 import {ObjectId} from "mongodb";
 
-
 export const mapper = {
     getClientBlog:(blog:BlogMongoIdT):BlogSimpleIdT=>{
         return {id:blog._id+"",
