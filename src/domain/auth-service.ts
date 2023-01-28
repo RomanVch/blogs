@@ -19,6 +19,7 @@ export const authService = {
         if(!user){ return {code:400,body: [{message:'not found',field:'code'}]}}
         if(user?.isConfirmed) {return {code:400,body:[{message:'this user confirmed',field:'code'}]}}
         const change =  await usersDbRepository.changeUserByConfirmedCode(user.id)
+        
         if(change){
             return {code:200}
         } else {return {code:400,body:[{message:'not confirmed',field:'code'}]}}
