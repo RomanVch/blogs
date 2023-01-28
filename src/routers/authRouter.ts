@@ -3,8 +3,7 @@ import {
     validBodyEmail,
     validBodyLogin,
     validBodyString,
-    validLoginOrEmail,
- validQueryString
+    validLoginOrEmail
 } from "../utils/validators";
 import {errorsValidatorAuthMiddleware, errorsValidatorMiddleware} from "../middlewares/errors-middlewares";
 import {authService} from "../domain/auth-service";
@@ -63,25 +62,15 @@ authRouter.post('/registration',
               }
     })
 
-authRouter.get('/registration-confirmation',
-    validQueryString("code"),
+authRouter.post('/registration-confirmation',
+    validBodyString("code"),
     errorsValidatorMiddleware,
     async (req, res) => {
-        const {code} = req.query
-        console.log(code)
+        const {code} = req.body
         const checkConfirmationUser = await authService.registrationConfirmation(code as string)
         generators.messageRes({res,...checkConfirmationUser})
         }
     )
-authRouter.post('/registration-confirmation',
-    validQueryString("code"),
-    errorsValidatorMiddleware,
-    async (req, res) => {
-        const {code} = req.query
-        const checkConfirmationUser = await authService.registrationConfirmation(code as string)
-        generators.messageRes({res,...checkConfirmationUser})
-    }
-)
 
 authRouter.post("/registration-email-resending",
     validBodyEmail('email',1,80,"notHave"),
