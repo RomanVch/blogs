@@ -30,6 +30,7 @@ export const commentsDbRepository = {
         }
         return null
     },
+    
     async getCommentById(commentId:string) {
         const comment = await commentsDb.find({_id:new ObjectId(commentId)}).toArray()
         if(comment[0]){
