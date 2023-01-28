@@ -1,4 +1,5 @@
 import {WithId} from "mongodb";
+import add from "date-fns/add";
 
 export type PostT = {
     title: string,
@@ -41,7 +42,11 @@ export type CommentSimpleIdT = CommentT & { id:string };
 export type CommentMongoIdT = WithId<CommentT>;
 export type NewCommentT = CommentT & { postId:string };
 
-export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string };
+export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, emailConfirmation:{
+        isConfirmed:boolean,
+        expirationDate:Date,
+confirmationCode:string,
+} };
 export type UserSimpleIdT = UserT & { id:string };
 export type UserMongoIdT = WithId<UserForBaseIdT>;
 
@@ -54,3 +59,4 @@ export type CorrectPostT = {id:string,title:string, shortDescription:string, con
 export type AccessTokenT = {
     accessToken:string
 }
+

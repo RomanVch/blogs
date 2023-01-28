@@ -48,7 +48,7 @@ usersRouter.post('/',
     async (req, res) => {
             const {login,password,email} = req.body
             const newPost = await usersService.addUser({login,password,email})
-            res.status(201).send(newPost);
+            res.status(201).send(newPost.user);
     })
 
 usersRouter.delete('/:id',auth,

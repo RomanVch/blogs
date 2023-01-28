@@ -35,12 +35,36 @@ export const usersDbRepository = {
                 items: users.map((user) => mapper.getUserPost(user))
             };
         }
-
         return null
     },
     async getUserById(id:ObjectId){
         return usersDb.findOne({_id: id})
     },
+    async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
+        console.log(code === "ldemndk6w1bp80f0z38","ldemndk6w1bp80f0z38",code)
+        const user = await usersDb.findOne({"emailConfirmation.confirmationCode": code})
+
+        if(user){
+            return {
+                id:user._id.toString(),
+                login: user.login,
+                email: user.email,
+                createdAt: user.createdAt,
+                isConfirmed:user.emailConfirmation.isConfirmed
+            }
+        } else{
+            return null
+        }
+    },
+    async changeUserByConfirmedCode(id:string):Promise<boolean>{
+       try{
+        const update = await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.isConfirmed': true}})
+        return true
+       } catch(e){
+           console.error(e)
+           return false
+       }
+       },
     async getUserLogin(login:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({login})
     },
@@ -50,7 +74,6 @@ export const usersDbRepository = {
     async getUserByLoginOrEmail(loginOrEmail:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
     },
-
     async addUser(newUser:UserForBaseIdT): Promise<UserSimpleIdT>{
         const result = await client.db('blogs').collection('users').insertOne(newUser);
         return {
@@ -58,10 +81,10 @@ export const usersDbRepository = {
             login: newUser.login,
             email: newUser.email,
             createdAt: newUser.createdAt,
-        };
+        }
     },
     async delUser(id:string) {
         const result = await usersDb.deleteOne({_id:new ObjectId(id)})
-        return result.deletedCount === 1;}
+        return result.deletedCount === 1
+    }
 }
-

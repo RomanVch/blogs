@@ -7,3 +7,5 @@ declare global {
         }
     }
 }
+type StatusMessage<T> = {status: "Success", body:T};
+type ErrorMessage ={message:string,field:string}

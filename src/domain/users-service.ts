@@ -1,10 +1,16 @@
+import bcrypt from "bcrypt";
+import {ObjectId} from "mongodb";
+import  add from 'date-fns/add';
 import { EndRouterT} from "../routers/blogsRouter";
+import { v4 as uuidv4 } from 'uuid';
 import {UserForBaseIdT, UserSimpleIdT} from "../repository/types";
 import {UsersQueryT} from "../routers/usersRouter";
 import {usersDbRepository} from "../repository/users-db-repository";
-import bcrypt from "bcrypt";
-import {ObjectId} from "mongodb";
 
+type ReturnCreateUserT = {
+    user:UserSimpleIdT,
+    confirmationCode:string
+}
 
 
 export const usersService = {
@@ -22,18 +28,27 @@ export const usersService = {
             }
         },
 
-    async addUser(newUserData:{login:string,password:string,email:string}): Promise<UserSimpleIdT>{
+
+    async addUser(newUserData:{login:string,password:string,email:string}): Promise<ReturnCreateUserT>{
         const dateNow = new Date()
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(newUserData.password, passwordSalt);
+        const confirmationCode = uuidv4();
+        const expirationDate = add(new Date(), {minutes:10})
         const newUser:UserForBaseIdT = {
             login: newUserData.login,
             email: newUserData.email,
             createdAt:dateNow.toISOString(),
             passwordHash,
-            passwordSalt
+            passwordSalt,
+            emailConfirmation:{
+             isConfirmed:false,
+                expirationDate,
+                confirmationCode
         }
-        return usersDbRepository.addUser(newUser);
+        }
+        const userForUi = await usersDbRepository.addUser(newUser)
+        return {user:userForUi,confirmationCode};
     },
     async delUser(id:string){
         return usersDbRepository.delUser(id);

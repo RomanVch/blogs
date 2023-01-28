@@ -40,9 +40,9 @@ export const validParamCommentId = ()=> param('id').isString().trim().isLength({
 })
 export const validUrl = (field:string,min:number=1,max:number=30,RegExp:RegExp)=> body(field).isString().trim().isLength({min,max}).matches(RegExp)
 
-export const validBodyEmail = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max}).isEmail().custom(async (email:string)=>{
+export const validBodyEmail = (field:string,min:number=1,max:number=30,howCheckLogin:"have"|"notHave"='have')=> body(field).isString().trim().isLength({min,max}).isEmail().custom(async (email:string)=>{
     const emailCheck = await usersDbRepository.getUserEmail(email)
-    if (emailCheck) throw new Error()
+    if (howCheckLogin === "notHave"?!emailCheck:emailCheck) throw new Error()
     return true
 })
 
@@ -53,10 +53,10 @@ export const validBodyLogin = (field:string,min:number=1,max:number=30,howCheckL
 })
 
 export const validLoginOrEmail = (min:number=1,max:number=30,howCheckLogin:"have"|"notHave")=> {
-    const loginOrEmail = body('loginOrEmail').isString().trim().isLength({min,max}).custom(async (login:string)=>{
+    return body('loginOrEmail').isString().trim().isLength({min, max}).custom(async (login: string) => {
         const loginCheck = await usersDbRepository.getUserLogin(login)
-        if (howCheckLogin === "have"?!loginCheck:loginCheck) throw new Error()
+        if (howCheckLogin === "have" ? !loginCheck : loginCheck) throw new Error()
         return loginCheck
-})
-    return loginOrEmail;
+    });
 }
+
