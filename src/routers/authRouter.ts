@@ -46,7 +46,7 @@ authRouter.post('/registration',
     validBodyLogin('login',3,10,"notHave"),
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
-    errorsValidatorAuthMiddleware,
+    errorsValidatorMiddleware,
     async (req, res) => {
         const {login,password,email} = req.body
             const addUser = await usersService.addUser({login,password,email})
@@ -65,7 +65,7 @@ authRouter.post('/registration',
 
 authRouter.get('/registration-confirmation',
     validQueryString("code"),
-    errorsValidatorAuthMiddleware,
+    errorsValidatorMiddleware,
     async (req, res) => {
         const {code} = req.query
         console.log(code)
@@ -75,7 +75,7 @@ authRouter.get('/registration-confirmation',
     )
 authRouter.post('/registration-confirmation',
     validQueryString("code"),
-    errorsValidatorAuthMiddleware,
+    errorsValidatorMiddleware,
     async (req, res) => {
         const {code} = req.query
         const checkConfirmationUser = await authService.registrationConfirmation(code as string)
