@@ -45,6 +45,11 @@ export const validBodyEmail = (field:string,min:number=1,max:number=30,howCheckL
     if (howCheckLogin === "notHave"?!emailCheck:emailCheck) throw new Error()
     return true
 })
+export const validResentBodyEmail = (field:string,min:number=1,max:number=90)=> body(field).isString().trim().isLength({min,max}).isEmail().custom(async (email:string)=>{
+    const emailCheck = await usersDbRepository.getUserEmail(email)
+    if(emailCheck && emailCheck?.emailConfirmation.isConfirmed) throw new Error()
+    return true
+})
 
 export const validBodyLogin = (field:string,min:number=1,max:number=30,howCheckLogin:"have"|"notHave")=> body(field).isString().trim().isLength({min,max}).custom(async (login:string)=>{
     const loginCheck = await usersDbRepository.getUserLogin(login)

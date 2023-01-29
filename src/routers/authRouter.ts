@@ -3,7 +3,7 @@ import {
     validBodyEmail,
     validBodyLogin,
     validBodyString,
-    validLoginOrEmail
+    validLoginOrEmail, validResentBodyEmail
 } from "../utils/validators";
 import {errorsValidatorAuthMiddleware, errorsValidatorMiddleware} from "../middlewares/errors-middlewares";
 import {authService} from "../domain/auth-service";
@@ -73,7 +73,7 @@ authRouter.post('/registration-confirmation',
     )
 
 authRouter.post("/registration-email-resending",
-    validBodyEmail('email',1,80,"notHave"),
+    validResentBodyEmail('email'),
     errorsValidatorMiddleware,
     async (req, res) => {
         const {email} = req.body
