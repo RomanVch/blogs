@@ -73,7 +73,7 @@ authRouter.post('/registration-confirmation',
     )
 
 authRouter.post("/registration-email-resending",
-    validBodyEmail('email',1,80),
+    validBodyEmail('email',1,80,"notHave"),
     errorsValidatorMiddleware,
     async (req, res) => {
         const {email} = req.body
