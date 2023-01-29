@@ -19,14 +19,16 @@ export const authService = {
         if(!user){ return {code:400,body: [{message:'not found',field:'code'}]}}
         if(user?.isConfirmed) {return {code:400,body:[{message:'this user confirmed',field:'code'}]}}
         const change =  await usersDbRepository.changeUserByConfirmedCode(user.id)
-        
+
         if(change){
-            return {code:200}
+            return {code:204}
         } else {return {code:400,body:[{message:'not confirmed',field:'code'}]}}
             },
 
     async resendingRegistrationEmail (email:string): Promise<MessageForResT<BodyForMessageT>>{
+        console.log(email)
         const user = await usersDbRepository.getUserEmail(email)
+        console.log(user)
         if(!user){ return {code:400,body: [{message:'not found',field:'email'}]}}
         if(user.emailConfirmation.isConfirmed){ return {code:400,body: [{message:'this account confirmed',field:'email'}]}}
         const emailSend = await emailManager.sendConfirmationEmail(email,user.emailConfirmation.confirmationCode)

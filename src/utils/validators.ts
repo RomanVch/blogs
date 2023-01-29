@@ -42,7 +42,7 @@ export const validUrl = (field:string,min:number=1,max:number=30,RegExp:RegExp)=
 
 export const validBodyEmail = (field:string,min:number=1,max:number=30,howCheckLogin:"have"|"notHave"='have')=> body(field).isString().trim().isLength({min,max}).isEmail().custom(async (email:string)=>{
     const emailCheck = await usersDbRepository.getUserEmail(email)
-    if (howCheckLogin === "notHave"?!emailCheck:emailCheck) throw new Error()
+    if (howCheckLogin === "have"?!emailCheck:emailCheck) throw new Error()
     return true
 })
 
