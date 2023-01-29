@@ -32,7 +32,7 @@ authRouter.post('/login',
         const user = await authService.auth({loginOrEmail, password})
         if (!user) {
             res.sendStatus(401)
-        } else if(user.emailConfirmation.isConfirmed){
+        } else if(!user.emailConfirmation.isConfirmed){
             res.sendStatus(401)
         }
         else {
