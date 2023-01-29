@@ -30,11 +30,12 @@ authRouter.post('/login',
     async (req, res) => {
         const {loginOrEmail,password} = req.body
         const user = await authService.auth({loginOrEmail, password})
+        console.log("-------",user)
         if (!user) {
             res.sendStatus(401)
-        } else if(!user.emailConfirmation.isConfirmed){
+        } /*else if(!user.emailConfirmation.isConfirmed){
             res.sendStatus(401)
-        }
+        }*/
         else {
             const token = await jwtService.createJWT(user)
             res.status(200).send(token);

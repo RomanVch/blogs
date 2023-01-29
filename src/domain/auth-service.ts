@@ -10,6 +10,7 @@ export const authService = {
     async auth(auth:{loginOrEmail:string,password:string}): Promise<UserMongoIdT|null>{
         const {loginOrEmail,password} = auth
         const user = await usersDbRepository.getUserByLoginOrEmail(loginOrEmail)
+        console.log("===",user)
         if(!user){ return null}
             const passwordHash = await bcrypt.hash(password,user.passwordSalt)
             return user.passwordHash === passwordHash ? user:null;
