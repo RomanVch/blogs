@@ -56,15 +56,24 @@ export const usersDbRepository = {
             return null
         }
     },
-    async changeUserByConfirmedCode(id:string):Promise<boolean>{
+    async changeUserByIsConfirmedCode(id:string):Promise<boolean>{
        try{
-        const update = await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.isConfirmed': true}})
+        await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.isConfirmed': true}})
         return true
        } catch(e){
            console.error(e)
            return false
        }
        },
+    async changeUserByConfirmedCode(id:string,code:string):Promise<boolean>{
+        try{
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.confirmationCode': code}})
+            return true
+        } catch(e){
+            console.error(e)
+            return false
+        }
+    },
     async getUserLogin(login:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({login})
     },
