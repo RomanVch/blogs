@@ -1,5 +1,6 @@
 import express from "express"
 import bodyParser from "body-parser"
+import cookieParser from  "cookie-parser"
 import postRouter from "./routers/postRouter";
 import blogsRouter from "./routers/blogsRouter";
 import {testingAllDataRouter} from "./routers/testingAllDataRouters";
@@ -14,6 +15,7 @@ const port = 3003
 const parserMiddleware = bodyParser.json();
 
 app.use(parserMiddleware)
+    .use(cookieParser())
     .use("/posts", postRouter)
     .use("/blogs", blogsRouter)
     .use("/users", usersRouter)

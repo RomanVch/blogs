@@ -21,7 +21,7 @@ export const authRouter = Router({});
 authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res) => {
     const user = await usersService.getUserById(new ObjectId(req.user!.id))
     if(!user){ return res.status(404).send()}
-    return res.status(200).send(user);
+    return res.status(200).send({email:user.email, login:user.login, userId:user.id});
 })
 authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),
@@ -30,15 +30,17 @@ authRouter.post('/login',
     async (req, res) => {
         const {loginOrEmail,password} = req.body
         const user = await authService.auth({loginOrEmail, password})
-        console.log("-------",user)
         if (!user) {
             res.sendStatus(401)
         } /*else if(!user.emailConfirmation.isConfirmed){
             res.sendStatus(401)
         }*/
         else {
-            const token = await jwtService.createJWT(user)
-            res.status(200).send(token);
+            const token = await authService.refreshToken(user._id.toString())
+            if(token){
+                res.cookie('token', {refreshToken:token.refreshToken}, { httpOnly: true });
+                res.status(200).send({access_token:token.accessToken});
+            }
         }
     })
 
@@ -81,3 +83,32 @@ authRouter.post("/registration-email-resending",
         const checkingEmail = await authService.resendingRegistrationEmail(email)
         generators.messageRes({res,...checkingEmail})
 })
+
+authRouter.post('/refresh-token',
+    errorsValidatorMiddleware,
+    async (req, res) => {
+        const token = req.cookies.token.refreshToken;
+        const userId = await jwtService.getUserIdByToken(token,'refresh')
+        if(!userId){
+            res.status(400).send()
+            return
+        }
+        const newTokens = userId && await authService.refreshToken(userId.toString());
+        console.log(newTokens)
+        if(!newTokens) {
+            res.status(400).send()
+            return
+        }
+            res.cookie('token', {refreshToken:newTokens.refreshToken}, { httpOnly: true });
+            res.status(200).send({access_token:newTokens.accessToken});
+    })
+authRouter.post('/logout',
+    errorsValidatorMiddleware,
+    async (req, res) => {
+        const token = req.cookies.token.refreshToken;
+        const userId = await jwtService.getUserIdByToken(token,'refresh')
+        if(!userId){res.status(401).send()}
+        const deleteToken = userId && await authService.refreshToken(userId.toString());
+        if(!deleteToken) {res.status(401).send()}
+        res.status(200).send()
+    })

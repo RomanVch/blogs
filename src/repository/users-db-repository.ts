@@ -41,7 +41,6 @@ export const usersDbRepository = {
         return usersDb.findOne({_id: id})
     },
     async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
-        console.log(code === "ldemndk6w1bp80f0z38","ldemndk6w1bp80f0z38",code)
         const user = await usersDb.findOne({"emailConfirmation.confirmationCode": code})
 
         if(user){
@@ -68,6 +67,15 @@ export const usersDbRepository = {
     async changeUserByConfirmedCode(id:string,code:string):Promise<boolean>{
         try{
             await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.confirmationCode': code}})
+            return true
+        } catch(e){
+            console.error(e)
+            return false
+        }
+    },
+    async changeUserByAuth(id:string,auth:{refreshToken:string,ip:string}):Promise<boolean>{
+        try{
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{auth: auth}})
             return true
         } catch(e){
             console.error(e)

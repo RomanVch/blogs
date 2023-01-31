@@ -46,7 +46,10 @@ export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string,
         isConfirmed:boolean,
         expirationDate:Date,
 confirmationCode:string,
-} };
+},auth:{
+    refreshToken:string,
+        ip:string,
+    } };
 export type UserSimpleIdT = UserT & { id:string };
 export type UserMongoIdT = WithId<UserForBaseIdT>;
 
@@ -58,5 +61,8 @@ export type CorrectPostT = {id:string,title:string, shortDescription:string, con
 
 export type AccessTokenT = {
     accessToken:string
+}
+export type RefreshTokenT = {
+    refreshToken:string
 }
 

@@ -3,7 +3,7 @@ import {ObjectId} from "mongodb";
 import  add from 'date-fns/add';
 import { EndRouterT} from "../routers/blogsRouter";
 import { v4 as uuidv4 } from 'uuid';
-import {UserForBaseIdT, UserSimpleIdT} from "../repository/types";
+import {UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "../repository/types";
 import {UsersQueryT} from "../routers/usersRouter";
 import {usersDbRepository} from "../repository/users-db-repository";
 
@@ -27,7 +27,9 @@ export const usersService = {
                 createdAt: userMongo.createdAt
             }
         },
-
+    async getUserMongoById(id:ObjectId):Promise<UserMongoIdT|null>{
+        return  usersDbRepository.getUserById(new ObjectId(id))
+    },
 
     async addUser(newUserData:{login:string,password:string,email:string}): Promise<ReturnCreateUserT>{
         const dateNow = new Date()
@@ -45,7 +47,11 @@ export const usersService = {
              isConfirmed:false,
                 expirationDate,
                 confirmationCode
-        }
+        },
+            auth:{
+                refreshToken:"",
+                ip:"",
+            }
         }
         const userForUi = await usersDbRepository.addUser(newUser)
         return {user:userForUi,confirmationCode};
