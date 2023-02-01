@@ -19,7 +19,8 @@ export const jwtService = {
                 result = jwt.verify(token, settings.JWT_SECRET)
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
-                if(!checkBlackList){ return null }
+                console.log(checkBlackList);
+                if(!checkBlackList){ return null}
                 result = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoById(result.user_id)
                 if(!user || !result.user_id) {return null}
