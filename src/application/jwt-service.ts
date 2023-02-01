@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import {settings} from "./setting";
 import {ObjectId} from "mongodb";
 import {usersService} from "../domain/users-service";
+import {authService} from "../domain/auth-service";
 
 export const jwtService = {
     async createJWT(user:UserMongoIdT): Promise<AccessTokenT & RefreshTokenT> {
@@ -17,11 +18,13 @@ export const jwtService = {
             if(!secret){
                 result = jwt.verify(token, settings.JWT_SECRET)
             } else {
+                const checkBlackList = await authService.checkBlackList(token);
+                if(!checkBlackList){ return null }
                 result = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoById(result.user_id)
-                if(!user) {return null}
-                if(user.auth.refreshToken !== token) {return null}
-                return new ObjectId(result.user_id)
+                console.log(result.user_id,'------')
+                if(!user || !result.user_id) {return null}
+                return result.user_id
             }
         } catch (e) {
             return null;

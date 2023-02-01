@@ -6,6 +6,7 @@ import {UsersQueryT} from "../routers/usersRouter";
 import {ObjectId} from "mongodb";
 
 const usersDb = client.db("blogs").collection<UserMongoIdT>("users")
+const infoBackDb = client.db("blogs").collection<UserMongoIdT>("infoBack")
 
 export const usersDbRepository = {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
@@ -67,15 +68,6 @@ export const usersDbRepository = {
     async changeUserByConfirmedCode(id:string,code:string):Promise<boolean>{
         try{
             await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.confirmationCode': code}})
-            return true
-        } catch(e){
-            console.error(e)
-            return false
-        }
-    },
-    async changeUserByAuth(id:string,auth:{refreshToken:string,ip:string}):Promise<boolean>{
-        try{
-            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{auth: auth}})
             return true
         } catch(e){
             console.error(e)

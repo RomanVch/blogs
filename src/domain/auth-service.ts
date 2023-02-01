@@ -1,13 +1,12 @@
 import {usersDbRepository} from "../repository/users-db-repository";
 import bcrypt from "bcrypt";
 import {AccessTokenT, RefreshTokenT, UserMongoIdT} from "../repository/types";
-import {ErrorMessage, StatusMessage} from "../types/types";
 import {BodyForMessageT, MessageForResT} from "../utils/generators";
 import {emailManager} from "../manager/email-manager";
 import { v4 as uuidv4 } from 'uuid';
 import {ObjectId} from "mongodb";
 import {jwtService} from "../application/jwt-service";
-import {auth} from "../middlewares/auth";
+import {infoBackDbRepository} from "../repository/infoBack-db-repository";
 
 export const authService = {
     async auth(auth:{loginOrEmail:string,password:string}): Promise<UserMongoIdT|null>{
@@ -42,15 +41,32 @@ export const authService = {
 
         return {code:204}
     },
-    async refreshToken (id:string): Promise<AccessTokenT & RefreshTokenT|null>{
+    async getTokens (id:string): Promise<AccessTokenT & RefreshTokenT|null>{
         const user = await usersDbRepository.getUserById(new ObjectId(id))
         if(!user){ return null}
         const refreshToken = await jwtService.createJWT(user)
         if(!refreshToken){ return null }
-        await usersDbRepository.changeUserByAuth(id,{refreshToken:refreshToken.refreshToken,ip:"123.124.531.342"})
         return refreshToken
     },
-    async logout(id:string){
-        return usersDbRepository.changeUserByAuth(id,{refreshToken:'',ip:''})
+    async refreshToken (id:string,oldToken:string): Promise<AccessTokenT & RefreshTokenT|null>{
+        const user = await usersDbRepository.getUserById(new ObjectId(id))
+        if(!user){ return null}
+        console.log(`refresh token1`)
+        const refreshToken = await jwtService.createJWT(user)
+        if(!refreshToken){ return null }
+        console.log(`refresh token2`)
+        const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
+        if(!addBlackList){return null}
+        console.log(`refresh token3`)
+        return refreshToken
+    },
+    async logout(oldToken:string){
+        const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
+        if(!addBlackList){return null}
+        return addBlackList
+    },
+    async checkBlackList(token:string){
+        const boolBlackList = await infoBackDbRepository.findTokenInBlackList(token)
+        return !boolBlackList
     }
 }

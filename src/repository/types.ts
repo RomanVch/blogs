@@ -1,4 +1,4 @@
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import add from "date-fns/add";
 
 export type PostT = {
@@ -46,10 +46,7 @@ export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string,
         isConfirmed:boolean,
         expirationDate:Date,
 confirmationCode:string,
-},auth:{
-    refreshToken:string,
-        ip:string,
-    } };
+}};
 export type UserSimpleIdT = UserT & { id:string };
 export type UserMongoIdT = WithId<UserForBaseIdT>;
 
@@ -65,4 +62,6 @@ export type AccessTokenT = {
 export type RefreshTokenT = {
     refreshToken:string
 }
+
+export type InfoServerT = {blackList:string[]}
 
