@@ -51,13 +51,10 @@ export const authService = {
     async refreshToken (id:string,oldToken:string): Promise<AccessTokenT & RefreshTokenT|null>{
         const user = await usersDbRepository.getUserById(new ObjectId(id))
         if(!user){ return null}
-        console.log(`refresh token1`)
         const refreshToken = await jwtService.createJWT(user)
         if(!refreshToken){ return null }
-        console.log(`refresh token2`)
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
         if(!addBlackList){return null}
-        console.log(`refresh token3`)
         return refreshToken
     },
     async logout(oldToken:string){

@@ -18,7 +18,6 @@ export const infoBackDbRepository = {
                 if(!checkBlackList._id){
                     return false;
                 }
-                console.log(checkBlackList);
                 await infoBackDb.updateOne({_id:checkBlackList._id},{$push:{blackList:oldToken}});
             }
             return true

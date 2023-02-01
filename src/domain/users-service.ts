@@ -18,9 +18,7 @@ export const usersService = {
         return usersDbRepository.getUsers(usersQuery)
     },
     async getUserById(id:ObjectId):Promise<UserSimpleIdT|null>{
-        console.log(id,143423432)
         const userMongo = await usersDbRepository.getUserById(new ObjectId(id))
-        console.log(userMongo,"userMongo")
         if(!userMongo){ return null}
             return {
                 id: userMongo._id + "",

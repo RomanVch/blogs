@@ -7,8 +7,8 @@ import {authService} from "../domain/auth-service";
 
 export const jwtService = {
     async createJWT(user:UserMongoIdT): Promise<AccessTokenT & RefreshTokenT> {
-        const token = jwt.sign({user_id:user._id.toString()}, settings.JWT_SECRET, {expiresIn:"10s"})
-        const refreshToken = jwt.sign({user_id:user._id.toString()}, settings.REFRESH_TOKEN_SECRET, {expiresIn:"20s"})
+        const token = jwt.sign({user_id:user._id.toString()}, settings.JWT_SECRET, {expiresIn:"10m"})
+        const refreshToken = jwt.sign({user_id:user._id.toString()}, settings.REFRESH_TOKEN_SECRET, {expiresIn:"20m"})
         return {accessToken:token, refreshToken:refreshToken}
     },
     async getUserIdByToken(token:string|undefined,secret?:string){
@@ -19,7 +19,6 @@ export const jwtService = {
                 result = jwt.verify(token, settings.JWT_SECRET)
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
-                console.log(checkBlackList);
                 if(!checkBlackList){ return null}
                 result = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoById(result.user_id)
