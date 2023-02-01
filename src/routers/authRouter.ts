@@ -117,18 +117,16 @@ authRouter.post('/logout',
     errorsValidatorMiddleware,
     async (req, res) => {
     try {
-        console.log(req.cookies.refreshToken)
         if(!req.cookies.refreshToken){
             res.sendStatus(401)
             return
         }
-        console.log(req.cookies.refreshToken,1234124312)
         const token = req.cookies.refreshToken;
         const userId = await jwtService.getUserIdByToken(token,'refresh')
-        console.log(userId,1432);
         if(!userId){res.status(401).send()}
         const deleteToken = userId && await authService.logout(token);
         if(!deleteToken) {res.status(401).send()}
+        res.clearCookie('refreshToken');
         res.status(204).send()
     }catch (e) {
         console.log(e)
