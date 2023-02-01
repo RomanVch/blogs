@@ -25,7 +25,7 @@ authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res) => {
      if(!user){ return res.status(404).send()}
       res.status(200).send({email:user.email, login:user.login, userId:user.id});
  }catch (err) {
-     console.log(err)
+     console.log(err,123421342)
      res.sendStatus(401);
  }
 })
@@ -117,14 +117,21 @@ authRouter.post('/logout',
     errorsValidatorMiddleware,
     async (req, res) => {
     try {
-        if(!req.cookies.refreshToken){res.sendStatus(400)}
+        console.log(req.cookies.refreshToken)
+        if(!req.cookies.refreshToken){
+            res.sendStatus(401)
+            return
+        }
+        console.log(req.cookies.refreshToken,1234124312)
         const token = req.cookies.refreshToken;
         const userId = await jwtService.getUserIdByToken(token,'refresh')
+        console.log(userId,1432);
         if(!userId){res.status(401).send()}
         const deleteToken = userId && await authService.logout(token);
         if(!deleteToken) {res.status(401).send()}
         res.status(204).send()
-    }catch {
+    }catch (e) {
+        console.log(e)
         res.sendStatus(401)
     }
     })

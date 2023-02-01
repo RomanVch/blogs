@@ -13,24 +13,20 @@ export const jwtService = {
     },
     async getUserIdByToken(token:string|undefined,secret?:string){
         try {
-            console.log("=========",token)
             if(!token) { return null}
             let result:any
-            console.log(!secret)
             if(!secret){
-                console.log(jwt.verify(token, settings.JWT_SECRET),'[[[[[')
                 result = jwt.verify(token, settings.JWT_SECRET)
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
                 if(!checkBlackList){ return null }
                 result = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoById(result.user_id)
-                console.log(result.user_id,'------')
                 if(!user || !result.user_id) {return null}
             }
             return result.user_id
         } catch (e) {
-            console.log(e)
+            console.error(e)
             return null;
         }
     }
