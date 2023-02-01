@@ -39,7 +39,7 @@ authRouter.post('/login',
             const token = await authService.getTokens(user._id.toString())
             if(token){
                 res.cookie('token', {refreshToken:token.refreshToken}, { httpOnly: true,secure: true });
-                res.status(200).send({access_token:token.accessToken});
+                res.status(200).send({accessToken:token.accessToken});
             }
         }
     })
