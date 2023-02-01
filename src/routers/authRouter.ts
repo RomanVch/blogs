@@ -87,12 +87,12 @@ authRouter.post("/registration-email-resending",
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res) => {
-        if(!req.cookies.refreshToken){res.sendStatus(400)}
+        if(!req.cookies.refreshToken){res.sendStatus(401)}
         const token:string = req.cookies.refreshToken;
-        if(!token) {res.sendStatus(400)}
+        if(!token) {res.sendStatus(401)}
         const userId = await jwtService.getUserIdByToken(token,'refresh')
         if(!userId){
-            res.status(400).send()
+            res.status(401).send()
             return
         }
         const newTokens = await authService.refreshToken(userId.toString(),token);
