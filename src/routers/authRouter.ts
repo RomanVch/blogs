@@ -43,7 +43,7 @@ authRouter.post('/login',
         else {
             const token = await authService.getTokens(user._id.toString())
             if(token){
-                res.cookie('refreshToken', token.refreshToken, { httpOnly: true });
+                res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure:true });
                 res.status(200).send({accessToken:token.accessToken});
             }
         }
@@ -106,7 +106,7 @@ authRouter.post('/refresh-token',
             res.status(400).send()
             return
         }
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true });
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure:true });
             res.status(200).send({accessToken:newTokens.accessToken});
     }catch (err) {
         console.log(err)
