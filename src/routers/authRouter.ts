@@ -38,7 +38,7 @@ authRouter.post('/login',
         else {
             const token = await authService.getTokens(user._id.toString())
             if(token){
-                res.cookie('token', {refreshToken:token.refreshToken}, { httpOnly: true,secure: true });
+                res.cookie('refreshToken', token.refreshToken, { httpOnly: true,secure: true });
                 res.status(200).send({accessToken:token.accessToken});
             }
         }
@@ -87,8 +87,8 @@ authRouter.post("/registration-email-resending",
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res) => {
-        if(!req.cookies.token){res.sendStatus(400)}
-        const token:string = req.cookies.token.refreshToken;
+        if(!req.cookies.refreshToken){res.sendStatus(400)}
+        const token:string = req.cookies.refreshToken;
         if(!token) {res.sendStatus(400)}
         const userId = await jwtService.getUserIdByToken(token,'refresh')
         if(!userId){
@@ -100,13 +100,14 @@ authRouter.post('/refresh-token',
             res.status(400).send()
             return
         }
-            res.cookie('token', {refreshToken:newTokens.refreshToken}, { httpOnly: true,secure:true });
-            res.status(200).send({access_token:newTokens.accessToken});
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true,secure:true });
+            res.status(200).send({accessToken:newTokens.accessToken});
     })
 authRouter.post('/logout',
     errorsValidatorMiddleware,
     async (req, res) => {
-        const token = req.cookies.token.refreshToken;
+        if(!req.cookies.refreshToken){res.sendStatus(400)}
+        const token = req.cookies.refreshToken;
         const userId = await jwtService.getUserIdByToken(token,'refresh')
         if(!userId){res.status(401).send()}
         const deleteToken = userId && await authService.logout(token);

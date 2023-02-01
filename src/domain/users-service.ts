@@ -47,11 +47,7 @@ export const usersService = {
              isConfirmed:false,
                 expirationDate,
                 confirmationCode
-        },
-            auth:{
-                refreshToken:"",
-                ip:"",
-            }
+        }
         }
         const userForUi = await usersDbRepository.addUser(newUser)
         return {user:userForUi,confirmationCode};
