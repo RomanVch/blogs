@@ -19,9 +19,15 @@ export const authRouter = Router({});
 
 
 authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res) => {
-    const user = await usersService.getUserById(new ObjectId(req.user!.id))
-    if(!user){ return res.status(404).send()}
-    return res.status(200).send({email:user.email, login:user.login, userId:user.id});
+ try{
+     console.log(11111)
+     const user = await usersService.getUserById(new ObjectId(req.user!.id))
+     if(!user){ return res.status(404).send()}
+      res.status(200).send({email:user.email, login:user.login, userId:user.id});
+ }catch (err) {
+     console.log(err)
+     res.sendStatus(401);
+ }
 })
 authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),

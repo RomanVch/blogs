@@ -39,6 +39,7 @@ export const usersDbRepository = {
         return null
     },
     async getUserById(id:ObjectId){
+        console.log(id,12376543)
         return usersDb.findOne({_id: id})
     },
     async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
