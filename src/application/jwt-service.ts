@@ -7,8 +7,8 @@ import {authService} from "../domain/auth-service";
 
 export const jwtService = {
     async createJWT(user:UserMongoIdT): Promise<AccessTokenT & RefreshTokenT> {
-        const token = jwt.sign({user_id:user._id.toString()}, settings.JWT_SECRET, {expiresIn:"10s"})
-        const refreshToken = jwt.sign({user_id:user._id.toString()}, settings.REFRESH_TOKEN_SECRET, {expiresIn:"20s"})
+        const token = jwt.sign({user_id:user._id.toString()}, settings.JWT_SECRET, {expiresIn:10000})
+        const refreshToken = jwt.sign({user_id:user._id.toString()}, settings.REFRESH_TOKEN_SECRET, {expiresIn:20000})
         return {accessToken:token,refreshToken:refreshToken}
     },
     async getUserIdByToken(token:string|undefined,secret?:string){
