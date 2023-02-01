@@ -87,6 +87,7 @@ authRouter.post("/registration-email-resending",
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res) => {
+    try {
         if(!req.cookies.refreshToken){res.sendStatus(401)}
         const token:string = req.cookies.refreshToken;
         if(!token) {res.sendStatus(401)}
@@ -102,10 +103,14 @@ authRouter.post('/refresh-token',
         }
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true,secure:true });
             res.status(200).send({accessToken:newTokens.accessToken});
+    }catch{
+        res.sendStatus(401)
+    }
     })
 authRouter.post('/logout',
     errorsValidatorMiddleware,
     async (req, res) => {
+    try {
         if(!req.cookies.refreshToken){res.sendStatus(400)}
         const token = req.cookies.refreshToken;
         const userId = await jwtService.getUserIdByToken(token,'refresh')
@@ -113,4 +118,7 @@ authRouter.post('/logout',
         const deleteToken = userId && await authService.logout(token);
         if(!deleteToken) {res.status(401).send()}
         res.status(204).send()
+    }catch {
+        res.sendStatus(401)
+    }
     })
