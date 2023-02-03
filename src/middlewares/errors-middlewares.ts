@@ -13,6 +13,7 @@ export const errorsValidatorMiddleware =(req:Request,res:Response,next:NextFunct
 }
 ///
 export const errorsValidatorAuthMiddleware =(req:Request,res:Response,next:NextFunction) => {
+    console.log(validationResult(req).array({ onlyFirstError: true }));
     const errors = validationResult(req).array({ onlyFirstError: true }).length > 0 ? {message:"If the inputModel has incorrect values",field:"loginOrEmail | password",} :''
     if (errors) {
         generators.messageRes({res,code:401,body:[errors]})

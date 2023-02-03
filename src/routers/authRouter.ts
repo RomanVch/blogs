@@ -36,16 +36,20 @@ authRouter.post('/login',
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
+        console.log(1)
         if(!ip || !userAgent){ return res.sendStatus(400) }
         const user = await authService.auth({loginOrEmail, password,userAgent,ip:ip as string});
+        console.log(2)
         if (!user) {
             res.sendStatus(401)
         } /* else if(!user.emailConfirmation.isConfirmed){
             res.sendStatus(401)
         }*/
         else {
+            console.log(3)
             const token = await authService.getTokens(user._id.toString())
             if(token){
+                console.log(4)
                 res.cookie('refreshToken', token.refreshToken, { httpOnly: true });
                 res.status(200).send({accessToken:token.accessToken});
             }
