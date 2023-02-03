@@ -1,20 +1,32 @@
 import {usersDbRepository} from "../repository/users-db-repository";
 import bcrypt from "bcrypt";
-import {AccessTokenT, RefreshTokenT, UserMongoIdT} from "../repository/types";
+import {AccessTokenT, RefreshTokenT, UserDevicesSessionsBaseT, UserMongoIdT} from "../repository/types";
 import {BodyForMessageT, MessageForResT} from "../utils/generators";
 import {emailManager} from "../manager/email-manager";
 import { v4 as uuidv4 } from 'uuid';
 import {ObjectId} from "mongodb";
 import {jwtService} from "../application/jwt-service";
 import {infoBackDbRepository} from "../repository/infoBack-db-repository";
+import {getDeviceSession} from "../utils/getDeviceSession";
+import {usersService} from "./users-service";
 
 export const authService = {
-    async auth(auth:{loginOrEmail:string,password:string}): Promise<UserMongoIdT|null>{
-        const {loginOrEmail,password} = auth
+    async auth(auth:{loginOrEmail:string,password:string,userAgent:string,ip:string}): Promise<UserMongoIdT|null>{
+        const {loginOrEmail,password, userAgent,ip} = auth
         const user = await usersDbRepository.getUserByLoginOrEmail(loginOrEmail)
-        if(!user){ return null}
+        if (!user) { return null }
             const passwordHash = await bcrypt.hash(password,user.passwordSalt)
-            return user.passwordHash === passwordHash ? user:null;
+            if(user.passwordHash !== passwordHash) { return null }
+            const checkDeviceSession = await usersService.findDevicesSessions(user._id.toString(),ip,userAgent)
+        if (!checkDeviceSession) {
+            const deviceSession = getDeviceSession(userAgent,ip);
+            const checkAddDevice = await usersService.addDevicesSessions(user._id.toString(),deviceSession);
+            if (!checkAddDevice) { return null }
+        } else {
+            const updateDeviceSession = await usersService.newEnterDeviceSession(user._id.toString(),checkDeviceSession.deviceId);
+            if(!updateDeviceSession){ return null }
+        }
+        return user
     },
     async registrationConfirmation(code:string): Promise<MessageForResT<BodyForMessageT>>{
         const user = await usersDbRepository.getUserByConfirmedCode(code)

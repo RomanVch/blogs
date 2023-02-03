@@ -47,7 +47,10 @@ usersRouter.post('/',
     errorsValidatorMiddleware,
     async (req, res) => {
             const {login,password,email} = req.body
-            const newPost = await usersService.addUser({login,password,email})
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        const userAgent = req.headers['user-agent']
+        if(!ip || !userAgent){ return res.sendStatus(400) }
+            const newPost = await usersService.addUser({login,password,email,userAgent,ip:ip as string})
             res.status(201).send(newPost.user);
     })
 

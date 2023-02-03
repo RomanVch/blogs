@@ -42,11 +42,23 @@ export type CommentSimpleIdT = CommentT & { id:string };
 export type CommentMongoIdT = WithId<CommentT>;
 export type NewCommentT = CommentT & { postId:string };
 
+
+export type UserDevicesSessionsT =   {
+    ip: string,
+    deviceId: string,
+    title: string
+}
+
+export type UserDevicesSessionsBaseT =   UserDevicesSessionsT & {
+    lastActiveDate: string,
+}
 export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, emailConfirmation:{
         isConfirmed:boolean,
         expirationDate:Date,
-confirmationCode:string,
-}};
+        confirmationCode:string,
+}
+    devicesSessions:UserDevicesSessionsBaseT[]
+};
 export type UserSimpleIdT = UserT & { id:string };
 export type UserMongoIdT = WithId<UserForBaseIdT>;
 

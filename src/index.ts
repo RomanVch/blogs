@@ -8,19 +8,23 @@ import {runDb} from "./repository/dataBase";
 import usersRouter from "./routers/usersRouter";
 import {authRouter} from "./routers/authRouter";
 import {commentsRouter} from "./routers/commentsRouter";
+import {securityDevicesRouter} from "./routers/securityDevicesRouter";
 
 export const app = express()
 const port = 3003
 
 const parserMiddleware = bodyParser.json();
 
+
 app.use(parserMiddleware)
+    .set('trust proxy', true)
     .use(cookieParser())
     .use("/posts", postRouter)
     .use("/blogs", blogsRouter)
     .use("/users", usersRouter)
     .use("/auth", authRouter)
     .use("/comments", commentsRouter)
+    .use("/security", securityDevicesRouter)
     .use("/testing/all-data",testingAllDataRouter)
 
 

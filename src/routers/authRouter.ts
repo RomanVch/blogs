@@ -34,7 +34,10 @@ authRouter.post('/login',
     errorsValidatorAuthMiddleware,
     async (req, res) => {
         const {loginOrEmail,password} = req.body
-        const user = await authService.auth({loginOrEmail, password})
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        const userAgent = req.headers['user-agent']
+        if(!ip || !userAgent){ return res.sendStatus(400) }
+        const user = await authService.auth({loginOrEmail, password,userAgent,ip:ip as string});
         if (!user) {
             res.sendStatus(401)
         } /* else if(!user.emailConfirmation.isConfirmed){
@@ -43,7 +46,7 @@ authRouter.post('/login',
         else {
             const token = await authService.getTokens(user._id.toString())
             if(token){
-                res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure:true });
+                res.cookie('refreshToken', token.refreshToken, { httpOnly: true });
                 res.status(200).send({accessToken:token.accessToken});
             }
         }
@@ -56,7 +59,10 @@ authRouter.post('/registration',
     errorsValidatorMiddleware,
     async (req, res) => {
         const {login,password,email} = req.body
-            const addUser = await usersService.addUser({login,password,email})
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        const userAgent = req.headers['user-agent']
+        if(!ip || !userAgent){ return res.sendStatus(400) }
+            const addUser = await usersService.addUser({login,password,email,userAgent,ip:ip as string})
               if(addUser){
                   const emailCheck = await emailManager.sendConfirmationEmail(email,addUser.confirmationCode)
                   if (emailCheck) {
@@ -106,7 +112,7 @@ authRouter.post('/refresh-token',
             res.status(400).send()
             return
         }
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure:true });
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true });
             res.status(200).send({accessToken:newTokens.accessToken});
     }catch (err) {
         console.log(err)

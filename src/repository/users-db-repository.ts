@@ -1,12 +1,11 @@
 import {client} from "./dataBase";
-import {UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "./types";
+import {UserDevicesSessionsBaseT, UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "./types";
 import {EndRouterT} from "../routers/blogsRouter";
 import {mapper} from "../utils/mapper";
 import {UsersQueryT} from "../routers/usersRouter";
 import {ObjectId} from "mongodb";
 
 const usersDb = client.db("blogs").collection<UserMongoIdT>("users")
-const infoBackDb = client.db("blogs").collection<UserMongoIdT>("infoBack")
 
 export const usersDbRepository = {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
@@ -90,6 +89,54 @@ export const usersDbRepository = {
             login: newUser.login,
             email: newUser.email,
             createdAt: newUser.createdAt,
+        }
+    },
+    async addDevicesSessions(userId: string, deviceSession: UserDevicesSessionsBaseT): Promise<boolean> {
+        try {
+            await usersDb.updateOne({_id:new ObjectId(userId)},{$push:{devicesSessions:deviceSession}});
+            return true
+        }catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+    async findUserDevicesSessions(userId: string,ip:string,title:string):Promise<UserDevicesSessionsBaseT|null> {
+        const user = await usersDb.findOne({_id:new ObjectId(userId)})
+        const checkDeviceSession = user?.devicesSessions.find((deviceSession) => deviceSession.ip == ip && deviceSession.title == title)
+        if(!checkDeviceSession){
+            return null
+        }else {
+            return checkDeviceSession
+        }
+    },
+    async newEnterDeviceSession(userId:string,deviceId:string):Promise<boolean> {
+        try {
+            await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString()}});
+            return true
+        }catch (error) {
+            console.error(error);
+            return false
+        }
+        },
+    async removeOtherSession(userId:string,deviceSession:UserDevicesSessionsBaseT):Promise<boolean> {
+       try {
+           await usersDb.updateOne({'devicesSessions.deviceId':deviceSession.deviceId},{$set:{devicesSessions:[deviceSession]}});
+           return true
+       } catch (e){
+           console.error(e);
+           return false
+       }
+       },
+    async removeIdDeviceSession(userId:string,deviceId:string):Promise<boolean> {
+        try {
+            await usersDb.updateOne(
+                { _id: new ObjectId(userId) },
+                { $pull: { devicesSessions: { deviceId: deviceId } } }
+            )
+            return true
+        } catch (e){
+            console.error(e);
+            return false
         }
     },
     async delUser(id:string) {
