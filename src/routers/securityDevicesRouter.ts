@@ -57,13 +57,19 @@ securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
 securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
     async (req, res) => {
         const deviceId = req.params.id
-        if(!deviceId) { res.sendStatus(404) }
+        if(!deviceId) { res.sendStatus(404)
+            return
+        }
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh');
 
         if (!ids || !ids.deviceId || !ids.userId) {
             res.status(401).send()
             return
+        }
+        const checkDeviceSession = await securityDevicesService.checkDeviceSession(deviceId)
+        if(!checkDeviceSession) { res.sendStatus(404)
+        return
         }
         const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(),deviceId)
         if(!checkDeleteIdDeviceSession){
