@@ -130,13 +130,20 @@ export const usersDbRepository = {
            return false
        }
        },
-    async checkDeviceSession(deviceId:string,userId:string):Promise<boolean> {
+    async checkDeviceSession(deviceId:string,userId:string):Promise<{message:string}> {
         try {
-           const checkDeviceSession = await usersDb.findOne({_id:new ObjectId(userId),'devicesSessions.deviceId':deviceId});
-            return !!checkDeviceSession
+           const checkDeviceSession = await usersDb.findOne({'devicesSessions.deviceId':deviceId});
+           if (!checkDeviceSession) {
+               return {message:"no device session"}
+           }
+           if(checkDeviceSession?._id.toString() !== userId){
+               return {message:"no permission"}
+           }
+
+            return {message:"Okay"}
         } catch (e){
             console.error(e);
-            return false
+            return {message:"db error"}
         }
     },
     async removeIdDeviceSession(userId:string,deviceId:string):Promise<boolean> {

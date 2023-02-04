@@ -76,7 +76,7 @@ export const usersService = {
         const checkUpdateDevice = await usersDbRepository.newEnterDeviceSession(userId,deviceId);
         return true
     },
-    async checkDeviceSession(deviceId:string, userId:string){
+    async checkDeviceSession(deviceId:string, userId:string): Promise<{message:string}>{
        return usersDbRepository.checkDeviceSession(deviceId, userId)
     },
     async removeOtherSession(userId:string,deviceSession:UserDevicesSessionsBaseT): Promise<boolean>{
