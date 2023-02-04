@@ -58,8 +58,9 @@ securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
     async (req, res) => {
         const deviceId = req.params.id
         const token:string = req.cookies.refreshToken;
-        const ids = await jwtService.getUserIdByToken(token,'refresh')
-        if (!ids) {
+        const ids = await jwtService.getUserIdByToken(token,'refresh');
+
+        if (!ids || !ids.deviceId || !ids.userId) {
             res.status(401).send()
             return
         }
