@@ -39,7 +39,9 @@ export const usersService = {
     async getUserMongoById(id:ObjectId):Promise<UserMongoIdT|null>{
         return  usersDbRepository.getUserById(new ObjectId(id))
     },
-
+    async getUserMongoByDeviceId(deviceId:string):Promise<UserMongoIdT|null>{
+        return  usersDbRepository.getUserByDeviceId(deviceId)
+    },
     async addUser(newUserData:{login:string,password:string,email:string,userAgent:string,ip:string}): Promise<ReturnCreateUserT>{
         const {login,password,email,userAgent,ip}= newUserData
         const dateNow = new Date()
@@ -71,7 +73,7 @@ export const usersService = {
         return usersDbRepository.findUserDevicesSessions(userId,ip,title);
     },
     async newEnterDeviceSession (userId:string,deviceId:string): Promise<boolean>{
-        const checkUpdateDevice = usersDbRepository.newEnterDeviceSession(userId,deviceId);
+        const checkUpdateDevice = await usersDbRepository.newEnterDeviceSession(userId,deviceId);
         return true
     },
     async removeOtherSession(userId:string,deviceSession:UserDevicesSessionsBaseT): Promise<boolean>{

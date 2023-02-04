@@ -17,8 +17,8 @@ const parserMiddleware = bodyParser.json();
 
 
 app.use(parserMiddleware)
-    .set('trust proxy', true)
     .use(cookieParser())
+    .set('trust proxy', true)
     .use("/posts", postRouter)
     .use("/blogs", blogsRouter)
     .use("/users", usersRouter)

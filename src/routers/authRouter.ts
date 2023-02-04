@@ -13,8 +13,7 @@ import {usersService} from "../domain/users-service";
 import {ObjectId} from "mongodb";
 import {emailManager} from "../manager/email-manager";
 import {generators} from "../utils/generators";
-import {tr} from "date-fns/locale";
-
+import {settings} from "../application/setting";
 
 export const authRouter = Router({});
 
@@ -37,21 +36,15 @@ authRouter.post('/login',
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
-        console.log(1)
         if(!ip || !userAgent){ return res.sendStatus(400) }
         const user = await authService.auth({loginOrEmail, password,userAgent,ip:ip as string});
-        console.log(2)
         if (!user) {
             res.sendStatus(401)
-        } /* else if(!user.emailConfirmation.isConfirmed){
-            res.sendStatus(401)
-        }*/
+        }
         else {
-            console.log(3)
-            const token = await authService.getTokens(user._id.toString())
+            const token = await authService.getTokens(user.devicesSessions[0].deviceId)
             if(token){
-                console.log(4)
-                res.cookie('refreshToken', token.refreshToken, { httpOnly: true,secure: true });
+                res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
                 res.status(200).send({accessToken:token.accessToken});
             }
         }
@@ -104,20 +97,29 @@ authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res) => {
     try {
-        if(!req.cookies.refreshToken){res.sendStatus(401)}
+        console.log(req.cookies.refreshToken)
+        if(!req.cookies.refreshToken){res.sendStatus(401)
+            return
+        }
         const token:string = req.cookies.refreshToken;
-        if(!token) {res.sendStatus(401)}
-        const userId = await jwtService.getUserIdByToken(token,'refresh')
-        if(!userId){
+        console.log(token,req.cookies)
+        if(!token) {
+            res.sendStatus(401)
+        }
+        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if(!ids){
             res.status(401).send()
             return
         }
-        const newTokens = await authService.refreshToken(userId.toString(),token);
+        console.log(ids.deviceId)
+        const newTokens = await authService.refreshToken(ids.deviceId,token);
+        console.log(newTokens)
         if(!newTokens) {
             res.status(400).send()
             return
         }
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure:true });
+  
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
             res.status(200).send({accessToken:newTokens.accessToken});
     }catch (err) {
         console.log(err)
@@ -132,9 +134,9 @@ authRouter.post('/logout',
             return
         }
         const token = req.cookies.refreshToken;
-        const userId = await jwtService.getUserIdByToken(token,'refresh')
-        if(!userId){res.status(401).send()}
-        const deleteToken = userId && await authService.logout(token);
+        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if(!ids){res.status(401).send()}
+        const deleteToken = ids && await authService.logout(token);
         if(!deleteToken) {res.status(401).send()}
         res.clearCookie('refreshToken');
         res.status(204).send()

@@ -53,17 +53,17 @@ export const authService = {
 
         return {code:204}
     },
-    async getTokens (id:string): Promise<AccessTokenT & RefreshTokenT|null>{
-        const user = await usersDbRepository.getUserById(new ObjectId(id))
+    async getTokens (deviceId:string): Promise<AccessTokenT & RefreshTokenT|null>{
+        const user = await usersDbRepository.getUserByDeviceId(deviceId)
         if(!user){ return null}
-        const refreshToken = await jwtService.createJWT(user)
+        const refreshToken = await jwtService.createJWT(deviceId)
         if(!refreshToken){ return null }
         return refreshToken
     },
-    async refreshToken (id:string,oldToken:string): Promise<AccessTokenT & RefreshTokenT|null>{
-        const user = await usersDbRepository.getUserById(new ObjectId(id))
+    async refreshToken (deviceId:string,oldToken:string): Promise<AccessTokenT & RefreshTokenT|null>{
+        const user = await usersDbRepository.getUserByDeviceId(deviceId)
         if(!user){ return null}
-        const refreshToken = await jwtService.createJWT(user)
+        const refreshToken = await jwtService.createJWT(deviceId)
         if(!refreshToken){ return null }
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
         if(!addBlackList){return null}

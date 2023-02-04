@@ -4,11 +4,11 @@ import {usersService} from "../domain/users-service";
 export const authJwt = async (req: Request, res: Response, next: NextFunction) => {
     if(req.headers.authorization) {
         const token = req.headers.authorization?.split(' ')[1]
-        const userID = await jwtService.getUserIdByToken(token)
-        if(!userID) {
+        const ids = await jwtService.getUserIdByToken(token)
+        if(!ids) {
             res.sendStatus(401)
         } else {
-            req.user = await usersService.getUserById(userID)
+            req.user = await usersService.getUserById(ids.userId)
             next();
         }
     } else{

@@ -40,6 +40,9 @@ export const usersDbRepository = {
     async getUserById(id:ObjectId){
         return usersDb.findOne({_id: id})
     },
+    async getUserByDeviceId(deviceId:string){
+        return usersDb.findOne({'devicesSessions.deviceId': deviceId})
+    },
     async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
         const user = await usersDb.findOne({"emailConfirmation.confirmationCode": code})
 

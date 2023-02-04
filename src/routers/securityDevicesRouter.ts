@@ -13,14 +13,14 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
         return
         }
         const token:string = req.cookies.refreshToken;
-        const userId = await jwtService.getUserIdByToken(token,'refresh')
-        if(!userId){
+        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if (!ids) {
             res.status(401).send()
             return
         }
-        const user = await usersService.getUserMongoById(userId);
-        console.log(3);
-        if(!userId){
+        const user = await usersService.getUserMongoById(ids.userId);
+
+        if(!user){
             res.status(401).send()
             return
         }
@@ -33,12 +33,12 @@ securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
             return
         }
         const token:string = req.cookies.refreshToken;
-        const userId = await jwtService.getUserIdByToken(token,'refresh')
-        if (!userId) {
+        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if (!ids) {
             res.status(401).send()
             return
         }
-        const user = await usersService.getUserMongoById(userId);
+        const user = await usersService.getUserMongoById(ids.userId);
         if(!user){
             res.status(401).send()
             return
@@ -47,7 +47,7 @@ securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
         const userAgent = req.headers['user-agent']
         if(!ip || !userAgent){res.sendStatus(400)
             return }
-        const checkRemoveOtherSession = await securityDevicesService.delOtherDevicesSession(userId,userAgent,ip as string)
+        const checkRemoveOtherSession = await securityDevicesService.delOtherDevicesSession(ids.userId.toString(),userAgent,ip as string)
         if(!checkRemoveOtherSession){
             res.sendStatus(401)
             return
@@ -58,15 +58,14 @@ securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
     async (req, res) => {
         const deviceId = req.params.id
         const token:string = req.cookies.refreshToken;
-        const userId = await jwtService.getUserIdByToken(token,'refresh')
-        if (!userId) {
+        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if (!ids) {
             res.status(401).send()
             return
         }
-        const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(userId,deviceId)
+        const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(),deviceId)
         if(!checkDeleteIdDeviceSession){
             res.sendStatus(401)
-
             return
         }
         res.sendStatus(204)
