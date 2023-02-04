@@ -130,9 +130,9 @@ export const usersDbRepository = {
            return false
        }
        },
-    async checkDeviceSession(deviceId:string):Promise<boolean> {
+    async checkDeviceSession(deviceId:string,userId:string):Promise<boolean> {
         try {
-           const checkDeviceSession = await usersDb.findOne({'devicesSessions.deviceId':deviceId});
+           const checkDeviceSession = await usersDb.findOne({_id:new ObjectId(userId),'devicesSessions.deviceId':deviceId});
             return !!checkDeviceSession
         } catch (e){
             console.error(e);

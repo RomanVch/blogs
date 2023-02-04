@@ -2,8 +2,8 @@ import {usersService} from "./users-service";
 import {ObjectId} from "mongodb";
 
 export const securityDevicesService = {
-    async checkDeviceSession(deviceId:string){
-        return await usersService.checkDeviceSession(deviceId);
+    async checkDeviceSession(deviceId:string, userId:string) {
+        return await usersService.checkDeviceSession(deviceId,userId);
     },
     async delOtherDevicesSession(userId:string,userAgent:string, ip:string){
         const user = await usersService.getUserMongoById(new ObjectId(userId));
