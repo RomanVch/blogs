@@ -118,7 +118,7 @@ authRouter.post('/refresh-token',
             res.status(400).send()
             return
         }
-  
+
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
             res.status(200).send({accessToken:newTokens.accessToken});
     }catch (err) {
