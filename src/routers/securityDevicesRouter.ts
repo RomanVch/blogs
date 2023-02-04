@@ -68,7 +68,7 @@ securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
             return
         }
         const checkDeviceSession = await securityDevicesService.checkDeviceSession(deviceId,ids.userId.toString())
-        if(!checkDeviceSession) { res.sendStatus(404)
+        if(!checkDeviceSession) { res.sendStatus(403)
         return
         }
         const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(),deviceId)
