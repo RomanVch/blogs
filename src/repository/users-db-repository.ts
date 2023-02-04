@@ -105,7 +105,7 @@ export const usersDbRepository = {
     },
     async findUserDevicesSessions(userId: string,ip:string,title:string):Promise<UserDevicesSessionsBaseT|null> {
         const user = await usersDb.findOne({_id:new ObjectId(userId)})
-        const checkDeviceSession = user?.devicesSessions.find((deviceSession) => deviceSession.ip == ip && deviceSession.title == title)
+        const checkDeviceSession = user?.devicesSessions.find((deviceSession) => deviceSession.ip == ip && deviceSession.title.substring(0,46) == title.substring(0,46))
         if(!checkDeviceSession){
             return null
         }else {
