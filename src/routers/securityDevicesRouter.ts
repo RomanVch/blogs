@@ -68,9 +68,15 @@ securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
             return
         }
         const checkDeviceSession = await securityDevicesService.checkDeviceSession(deviceId,ids.userId.toString())
-        if(checkDeviceSession.message === 'db error') { res.sendStatus(404)}
-            if(checkDeviceSession.message === 'no permission') { res.sendStatus(404)}
-        if(checkDeviceSession.message === 'no device session') { res.sendStatus(403)}
+        if(checkDeviceSession.message === 'db error') { res.sendStatus(404)
+        return
+        }
+            if(checkDeviceSession.message === 'no permission') { res.sendStatus(403)
+            return
+            }
+        if(checkDeviceSession.message === 'no device session') { res.sendStatus(404)
+        return
+        }
 
         const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(),deviceId)
         if(!checkDeleteIdDeviceSession){
