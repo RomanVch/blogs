@@ -5,7 +5,7 @@ export const authJwt = async (req: Request, res: Response, next: NextFunction) =
     if(req.headers.authorization) {
         const token = req.headers.authorization?.split(' ')[1]
         const ids = await jwtService.getUserIdByToken(token)
-        if(!ids || ids === 'empty') {
+        if(!ids) {
             res.sendStatus(401)
         } else {
             req.user = await usersService.getUserById(ids.userId)
