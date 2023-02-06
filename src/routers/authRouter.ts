@@ -106,7 +106,7 @@ authRouter.post('/refresh-token',
             res.sendStatus(401)
         }
         const ids = await jwtService.getUserIdByToken(token,'refresh')
-        if(!ids){
+        if(!ids || ids === 'empty'){
             res.status(401).send()
             return
         }
