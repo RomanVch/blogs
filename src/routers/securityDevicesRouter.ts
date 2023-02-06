@@ -9,18 +9,22 @@ import {securityDevicesService} from "../domain/security-devices-service";
 export const securityDevicesRouter = Router({});
 securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
     async (req, res) => {
-        if(!req.cookies.refreshToken){res.sendStatus(401)
+        if(!req.cookies.refreshToken){
+            console.error('No refresh token',req.cookies.refreshToken)
+            res.sendStatus(401)
         return
         }
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh')
         if (!ids) {
+            console.error('ids',ids)
             res.status(401).send()
             return
         }
         const user = await usersService.getUserMongoById(ids.userId);
 
         if(!user){
+            console.error('user',user)
             res.status(401).send()
             return
         }
