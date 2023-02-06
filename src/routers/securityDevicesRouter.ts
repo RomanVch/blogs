@@ -17,7 +17,10 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh')
         if(ids === 'empty'){
-            res.sendStatus(204)
+            res.status(200).send([{ip: "string",
+                deviceId: 'string',
+                title: "string",
+                lastActiveDate: new Date().toISOString(),}])
             return
         }
         if (!ids) {
