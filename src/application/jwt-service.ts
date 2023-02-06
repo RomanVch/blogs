@@ -15,18 +15,17 @@ export const jwtService = {
         try {
             if(!token) { return null}
             let deviceId:any
-            if(!secret){
+            if(!secret) {
                 deviceId = jwt.verify(token, settings.JWT_SECRET)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
                 if(!user) {return null}
                 return {userId:user._id,deviceId:deviceId.deviceId}
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
-                if(!checkBlackList){ return null}
+                if(!checkBlackList){ return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
                 if(!user) {return null}
-                console.log(user._id)
                 return {userId:user._id,deviceId:deviceId.deviceId}
             }
         } catch (e) {

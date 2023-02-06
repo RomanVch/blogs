@@ -97,12 +97,11 @@ authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res) => {
     try {
-        console.log(req.cookies.refreshToken)
-        if(!req.cookies.refreshToken){res.sendStatus(401)
+        if(!req.cookies.refreshToken){
+            res.sendStatus(401)
             return
         }
         const token:string = req.cookies.refreshToken;
-        console.log(token,req.cookies)
         if(!token) {
             res.sendStatus(401)
         }
@@ -111,13 +110,13 @@ authRouter.post('/refresh-token',
             res.status(401).send()
             return
         }
-        console.log(ids.deviceId)
         const newTokens = await authService.refreshToken(ids.deviceId,token);
-        console.log(newTokens)
         if(!newTokens) {
             res.status(400).send()
             return
         }
+        const updateDeviceSession = await usersService.newEnterDeviceSession(ids.userId.toString(),ids.deviceId);
+        if(!updateDeviceSession){ return null }
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
             res.status(200).send({accessToken:newTokens.accessToken});
