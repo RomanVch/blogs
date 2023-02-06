@@ -22,10 +22,12 @@ export const jwtService = {
                 return {userId:user._id,deviceId:deviceId.deviceId}
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
-                if(!checkBlackList){ return null }
+                if(!checkBlackList){console.error('checkBlackList',checkBlackList)
+                    return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
-                if(!user) {return null}
+                if(!user) { console.error('userGet',user)
+                    return null}
                 return {userId:user._id,deviceId:deviceId.deviceId}
             }
         } catch (e) {
