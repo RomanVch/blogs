@@ -15,7 +15,7 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
         return
         }
         const token:string = req.cookies.refreshToken;
-        const ids = await jwtService.getUserIdByToken(token,'refresh')
+        const ids = await jwtService.getUserIdByToken(token)
         if (!ids) {
             console.error('ids',ids)
             res.status(401).send()
