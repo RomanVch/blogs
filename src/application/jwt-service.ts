@@ -26,7 +26,7 @@ export const jwtService = {
                     return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
-                if(!user) { console.error('userGet',user)
+                if(!user) { console.error('userGet',user,'token',deviceId.deviceId)
                     return null}
                 return {userId:user._id,deviceId:deviceId.deviceId}
             }
