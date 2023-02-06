@@ -7,11 +7,16 @@ export const securityDevicesService = {
     },
     async delOtherDevicesSession(userId:string,userAgent:string, ip:string){
         const user = await usersService.getUserMongoById(new ObjectId(userId));
+        console.log(userAgent,ip,user)
         const activeSession = user?.devicesSessions.find((session) => session.ip === ip && session.title.substring(0, 46) === userAgent.substring(0, 46));
-        if(!activeSession){ return null }
-        const actualSession = {...activeSession, lastAccessed: new Date().toISOString()};
+        if(!activeSession){
+            console.log(1)
+            return null }
+        const actualSession = {...activeSession, lastActiveDate: new Date().toISOString()};
         const checkRemoveSession = await usersService.removeOtherSession(userId,actualSession)
-        if(!checkRemoveSession){ return null }
+        if(!checkRemoveSession){
+            console.log(2)
+            return null }
         return checkRemoveSession
     },
     async removeIdDeviceSession (userId:string,deviceId:string):Promise<boolean>{

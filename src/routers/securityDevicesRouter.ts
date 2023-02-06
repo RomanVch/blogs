@@ -32,7 +32,9 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
     })
 securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
     async (req, res) => {
+        console.log(123)
         if(!req.cookies.refreshToken){
+            console.log(req.cookies.refreshToken)
             res.sendStatus(401)
             return
         }
@@ -52,6 +54,7 @@ securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
         if(!ip || !userAgent){res.sendStatus(400)
             return }
         const checkRemoveOtherSession = await securityDevicesService.delOtherDevicesSession(ids.userId.toString(),userAgent,ip as string)
+        console.log(checkRemoveOtherSession)
         if(!checkRemoveOtherSession){
             res.sendStatus(401)
             return
