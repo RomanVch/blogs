@@ -16,6 +16,10 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
         }
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh')
+        if(ids === 'empty'){
+            res.sendStatus(204)
+            return
+        }
         if (!ids) {
             console.error('ids',ids)
             res.status(401).send()
@@ -38,7 +42,7 @@ securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
         }
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh')
-        if (!ids) {
+        if (!ids || ids === 'empty') {
             res.status(401).send()
             return
         }
@@ -67,7 +71,7 @@ securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
         const token:string = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh');
 
-        if (!ids || !ids.deviceId || !ids.userId) {
+        if (!ids || ids === 'empty' || !ids.deviceId || !ids.userId) {
             res.status(401).send()
             return
         }

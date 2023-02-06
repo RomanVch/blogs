@@ -11,14 +11,14 @@ export const jwtService = {
         const refreshToken = jwt.sign({deviceId}, settings.REFRESH_TOKEN_SECRET, {expiresIn:settings.TIME_LIFE_REFRESH_TOKEN})
         return {accessToken:token, refreshToken:refreshToken}
     },
-    async getUserIdByToken(token:string|undefined,secret?:string):Promise<{userId:ObjectId,deviceId:string}|null>{
+    async getUserIdByToken(token:string|undefined,secret?:string):Promise<{userId:ObjectId,deviceId:string}|null|'empty'>{
         try {
             if(!token) { return null}
             let deviceId:any
             if(!secret) {
                 deviceId = jwt.verify(token, settings.JWT_SECRET)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
-                if(!user) {return null}
+                if(!user) {return 'empty'}
                 return {userId:user._id,deviceId:deviceId.deviceId}
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
