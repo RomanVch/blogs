@@ -25,6 +25,7 @@ export const jwtService = {
                 if(!checkBlackList){console.error('checkBlackList',checkBlackList)
                     return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
+                console.log(deviceId)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
                 if(!user) { console.error('userGet',user,'token',deviceId.deviceId)
                     return null}
