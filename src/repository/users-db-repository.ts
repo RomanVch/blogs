@@ -115,7 +115,7 @@ export const usersDbRepository = {
     },
     async newEnterDeviceSession(userId:string,deviceId:string):Promise<boolean> {
         try {
-            await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString(),'devicesSessions.$.deleteActiveDate': new Date(Date.now() + settings.TIME_LIFE_MS_REFRESH_TOKEN).toISOString()}});
+            await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString(),'devicesSessions.$.deleteActiveDate':new Date(Date.now() + 12096e5).toISOString() }});
             return true
         }catch (error) {
             console.error(error);
