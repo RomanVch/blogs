@@ -28,7 +28,9 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
             res.status(401).send()
             return
         }
-        res.status(200).send(user?.devicesSessions);
+        res.status(200).send(user?.devicesSessions.map((session)=>{
+            return {lastActiveDate: session.lastActiveDate,deviceId: session.deviceId,title: session.title, ip:session.ip}
+        }));
     })
 securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
     async (req, res) => {

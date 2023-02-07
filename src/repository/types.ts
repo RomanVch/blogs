@@ -51,6 +51,7 @@ export type UserDevicesSessionsT =   {
 
 export type UserDevicesSessionsBaseT =   UserDevicesSessionsT & {
     lastActiveDate: string,
+    deleteActiveDate: string
 }
 export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, emailConfirmation:{
         isConfirmed:boolean,

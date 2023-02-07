@@ -4,6 +4,7 @@ import {EndRouterT} from "../routers/blogsRouter";
 import {mapper} from "../utils/mapper";
 import {UsersQueryT} from "../routers/usersRouter";
 import {ObjectId} from "mongodb";
+import {settings} from "../application/setting";
 
 const usersDb = client.db("blogs").collection<UserMongoIdT>("users")
 
@@ -114,7 +115,7 @@ export const usersDbRepository = {
     },
     async newEnterDeviceSession(userId:string,deviceId:string):Promise<boolean> {
         try {
-            await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString()}});
+            await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString(),'devicesSessions.$.deleteActiveDate': new Date(Date.now() + settings.TIME_LIFE_MS_REFRESH_TOKEN).toISOString()}});
             return true
         }catch (error) {
             console.error(error);
