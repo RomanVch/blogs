@@ -5,5 +5,5 @@ export const settings = {
     TIME_LIFE_ACCESS_TOKEN:process.env.TIME_LIFE_ACCESS_TOKEN || '10m',
     TIME_LIFE_REFRESH_TOKEN:process.env.TIME_LIFE_REFRESH_TOKEN || '20m',
     SCOPE: process.env.SCOPE || 'production',
-    TIME_LIFE_MS_REFRESH_TOKEN:process.env.TIME_LIFE_MS_REFRESH_TOKEN || '720000',
+    TIME_LIFE_MS_REFRESH_TOKEN:process.env.TIME_LIFE_MS_REFRESH_TOKEN || '720000'
 }
