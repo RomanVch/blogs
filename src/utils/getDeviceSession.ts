@@ -5,6 +5,5 @@ export const getDeviceSession = (userAgent:string,ip:string):UserDevicesSessions
     deviceId: uuidv4(),
     title:userAgent,
     ip:ip,
-    lastActiveDate:new Date().toISOString(),
-    deleteActiveDate: new Date(Date.now() + 12096e5).toISOString()
+    lastActiveDate:new Date().toISOString()
 })
