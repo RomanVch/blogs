@@ -122,9 +122,12 @@ export const usersDbRepository = {
             return false
         }
         },
-    async removeOtherSession(userId:string,deviceSession:UserDevicesSessionsBaseT):Promise<boolean> {
+    async removeOtherSession(userId:ObjectId,deviceId:string):Promise<boolean> {
        try {
-           await usersDb.updateOne({'devicesSessions.deviceId':deviceSession.deviceId},{$set:{devicesSessions:[deviceSession]}});
+           await usersDb.updateMany(
+               { _id: userId },
+               { $pull: { devicesSessions: { deviceId: { $ne: deviceId } } } }
+           )
            return true
        } catch (e){
            console.error(e);

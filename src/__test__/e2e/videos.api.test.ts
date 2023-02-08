@@ -1,8 +1,9 @@
-import request from 'supertest'
 import {app} from "../../index";
+import request from 'supertest';
 
-it('/videos',async ()=>{
-   await it('getAll',()=>{
-       request(app).get('/videos').expect(200,[])
-    })
-})
+describe("GET /posts", () => {
+    it("should return all products", async () => {
+        const res = await request(app).get("/posts");
+        expect(res.statusCode).toBe(200);
+    });
+});

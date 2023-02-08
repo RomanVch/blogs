@@ -22,7 +22,7 @@ export const jwtService = {
                 return {userId:user._id,deviceId:deviceId.deviceId}
             } else {
                 const checkBlackList = await authService.checkBlackList(token);
-                if(!checkBlackList){console.error('checkBlackList',checkBlackList)
+                if(!checkBlackList){
                     return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
                 console.log(deviceId)

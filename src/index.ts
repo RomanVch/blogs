@@ -1,7 +1,6 @@
 import express from "express"
 import bodyParser from "body-parser"
 import cookieParser from  "cookie-parser"
-import postRouter from "./routers/postRouter";
 import blogsRouter from "./routers/blogsRouter";
 import {testingAllDataRouter} from "./routers/testingAllDataRouters";
 import {runDb} from "./repository/dataBase";
@@ -9,6 +8,7 @@ import usersRouter from "./routers/usersRouter";
 import {authRouter} from "./routers/authRouter";
 import {commentsRouter} from "./routers/commentsRouter";
 import {securityDevicesRouter} from "./routers/securityDevicesRouter";
+import {postRouter} from "./routers/postRouter";
 
 export const app = express()
 const port = 3003

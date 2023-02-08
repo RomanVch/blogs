@@ -32,65 +32,32 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
             return {lastActiveDate: session.lastActiveDate,deviceId: session.deviceId,title: session.title, ip:session.ip}
         }));
     })
-securityDevicesRouter.delete('/devices',errorsValidatorMiddleware,
-    async (req, res) => {
-        console.log(123)
-        if(!req.cookies.refreshToken){
-            console.log(req.cookies.refreshToken)
-            res.sendStatus(401)
-            return
-        }
-        const token:string = req.cookies.refreshToken;
-        const ids = await jwtService.getUserIdByToken(token,'refresh')
-        if (!ids) {
-            res.status(401).send()
-            return
-        }
-        const user = await usersService.getUserMongoById(ids.userId);
-        if(!user){
-            res.status(401).send()
-            return
-        }
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-        const userAgent = req.headers['user-agent']
-        if(!ip || !userAgent){res.sendStatus(400)
-            return }
-        const checkRemoveOtherSession = await securityDevicesService.delOtherDevicesSession(ids.userId.toString(),userAgent,ip as string)
-        console.log(checkRemoveOtherSession)
-        if(!checkRemoveOtherSession){
-            res.sendStatus(401)
-            return
-        }
-        res.sendStatus(204)
-    })
-securityDevicesRouter.delete('/devices/:id',errorsValidatorMiddleware,
-    async (req, res) => {
-        const deviceId = req.params.id
-        if(!deviceId) { res.sendStatus(404)
-            return
-        }
-        const token:string = req.cookies.refreshToken;
-        const ids = await jwtService.getUserIdByToken(token,'refresh');
+securityDevicesRouter.delete('/devices', errorsValidatorMiddleware, async (req, res) => {
+    const { cookies: { refreshToken: token }, ip, headers: { 'user-agent': userAgent } } = req;
+    const ids = await jwtService.getUserIdByToken(token, 'refresh');
+    if (!ids || !ip || !userAgent) return res.status(401).send();
+    const check = await securityDevicesService.delOtherDevicesSession(ids.userId,ids.deviceId)
+    if (!check) {
+        return res.status(401).send();
+    }
+    res.status(204).send();
+});
+securityDevicesRouter.delete('/devices/:id', errorsValidatorMiddleware, async (req, res) => {
+    const deviceId = req.params.id;
+    if (!deviceId) return res.sendStatus(404);
 
-        if (!ids || !ids.deviceId || !ids.userId) {
-            res.status(401).send()
-            return
-        }
-        const checkDeviceSession = await securityDevicesService.checkDeviceSession(deviceId,ids.userId.toString())
-        if(checkDeviceSession.message === 'db error') { res.sendStatus(404)
-        return
-        }
-            if(checkDeviceSession.message === 'no permission') { res.sendStatus(403)
-            return
-            }
-        if(checkDeviceSession.message === 'no device session') { res.sendStatus(404)
-        return
-        }
+    const token = req.cookies.refreshToken;
+    const ids = await jwtService.getUserIdByToken(token, 'refresh');
 
-        const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(),deviceId)
-        if(!checkDeleteIdDeviceSession){
-            res.sendStatus(401)
-            return
-        }
-        res.sendStatus(204)
-    })
+    if (!ids || !ids.deviceId || !ids.userId) return res.status(401).send();
+
+    const checkDeviceSession = await securityDevicesService.checkDeviceSession(deviceId, ids.userId.toString());
+    if (checkDeviceSession.message === 'db error') return res.sendStatus(404);
+    if (checkDeviceSession.message === 'no permission') return res.sendStatus(403);
+    if (checkDeviceSession.message === 'no device session') return res.sendStatus(404);
+
+    const checkDeleteIdDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(), deviceId);
+    if (!checkDeleteIdDeviceSession) return res.sendStatus(401);
+
+    return res.sendStatus(204);
+});

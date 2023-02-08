@@ -79,13 +79,13 @@ export const usersService = {
     async checkDeviceSession(deviceId:string, userId:string): Promise<{message:string}>{
        return usersDbRepository.checkDeviceSession(deviceId, userId)
     },
-    async removeOtherSession(userId:string,deviceSession:UserDevicesSessionsBaseT): Promise<boolean>{
-        return usersDbRepository.removeOtherSession(userId,deviceSession);
+    async removeOtherSession(userId:ObjectId,deviceId:string): Promise<boolean>{
+        return usersDbRepository.removeOtherSession(userId,deviceId);
     },
     async removeIdDeviceSession(userId:string,deviceId:string): Promise<boolean>{
         return usersDbRepository.removeIdDeviceSession(userId,deviceId);
     },
-    async delUser(id:string){
+    async delUser(id:string) {
         return usersDbRepository.delUser(id);
     }
 }

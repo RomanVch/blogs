@@ -23,8 +23,9 @@ export type PostsQueryT = {
     pageNumber?:number
 }
 
-const postRouter = Router({});
+export const postRouter = Router();
 
+console.log('hello')
 postRouter.get('/',
     validQueryNumber('pageSize'),
     validQueryNumber('pageNumber'),
@@ -127,5 +128,3 @@ postRouter.delete('/:id',auth,
          res.sendStatus(404)
         }
 })
-
-export default postRouter
