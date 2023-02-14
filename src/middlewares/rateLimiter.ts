@@ -9,7 +9,7 @@ const attempts: Record<string, EndpointAttempts> = {};
 
 export const limitAttempts = (req: Request, res: Response, next: NextFunction) => {
     const endpoint = req.path;
-    const maxAttempts = 5;
+    const maxAttempts = 4;
     const windowMs = 10 * 1000;
     const now = Date.now();
 
@@ -41,5 +41,6 @@ export const limitAttempts = (req: Request, res: Response, next: NextFunction) =
     }
 
     attempts[endpoint].count = count + 1;
+    console.log(attempts)
     next();
 }
