@@ -14,7 +14,13 @@ import {ObjectId} from "mongodb";
 import {emailManager} from "../manager/email-manager";
 import {generators} from "../utils/generators";
 import {settings} from "../application/setting";
-import {limitAttempts} from "../middlewares/rateLimiter";
+import rateLimit from "express-rate-limit";
+
+// Создаем лимит на количество запросов для защищенного эндпоинта
+const apiLimiter = rateLimit({
+    windowMs: 10 * 1000, // Время окна (1 минута)
+    max: 10, // Максимальное количество запросов в окне
+});
 
 export const authRouter = Router({});
 
@@ -32,7 +38,7 @@ authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res):Promise<
 authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
-    limitAttempts,
+    apiLimiter,
     errorsValidatorAuthMiddleware,
     async (req, res):Promise<any> => {
         const {loginOrEmail,password} = req.body
@@ -56,7 +62,7 @@ authRouter.post('/registration',
     validBodyLogin('login',3,10,"notHave"),
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
-    limitAttempts,
+    apiLimiter,
     errorsValidatorMiddleware,
     async (req, res):Promise<any> => {
         const {login,password,email} = req.body
@@ -79,7 +85,7 @@ authRouter.post('/registration',
 
 authRouter.post('/registration-confirmation',
     validBodyString("code",8,100),
-    limitAttempts,
+    apiLimiter,
     errorsValidatorMiddleware,
     async (req, res) => {
         const {code} = req.body
@@ -89,7 +95,7 @@ authRouter.post('/registration-confirmation',
     )
 
 authRouter.post("/registration-email-resending",
-    limitAttempts,
+    apiLimiter,
     validResentBodyEmail('email'),
     errorsValidatorMiddleware,
     async (req, res) => {
