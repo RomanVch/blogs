@@ -36,10 +36,10 @@ authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res):Promise<
  }
 })
 authRouter.post('/login',
+    apiLimiter,
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
     errorsValidatorAuthMiddleware,
-    apiLimiter,
     async (req, res):Promise<any> => {
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
