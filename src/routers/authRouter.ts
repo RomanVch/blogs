@@ -38,8 +38,8 @@ authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res):Promise<
 authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
-    apiLimiter,
     errorsValidatorAuthMiddleware,
+    apiLimiter,
     async (req, res):Promise<any> => {
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
@@ -62,8 +62,8 @@ authRouter.post('/registration',
     validBodyLogin('login',3,10,"notHave"),
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
-    apiLimiter,
     errorsValidatorMiddleware,
+    apiLimiter,
     async (req, res):Promise<any> => {
         const {login,password,email} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
@@ -85,8 +85,8 @@ authRouter.post('/registration',
 
 authRouter.post('/registration-confirmation',
     validBodyString("code",8,100),
-    apiLimiter,
     errorsValidatorMiddleware,
+    apiLimiter,
     async (req, res) => {
         const {code} = req.body
         const checkConfirmationUser = await authService.registrationConfirmation(code as string)
@@ -95,9 +95,9 @@ authRouter.post('/registration-confirmation',
     )
 
 authRouter.post("/registration-email-resending",
-    apiLimiter,
     validResentBodyEmail('email'),
     errorsValidatorMiddleware,
+    apiLimiter,
     async (req, res) => {
         const {email} = req.body
         const checkingEmail = await authService.resendingRegistrationEmail(email)
