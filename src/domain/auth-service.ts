@@ -71,11 +71,16 @@ export const authService = {
         return refreshToken
     },
     async logout(oldToken:string){
+        console.log('start',oldToken)
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
+        console.log(1,addBlackList)
         const ids = await jwtService.getUserIdByToken(oldToken,'refresh')
+        console.log(2,ids)
         if(!ids){return null}
         const checkRemoveDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(), ids.deviceId);
+        console.log(3,checkRemoveDeviceSession)
         if(!addBlackList || !checkRemoveDeviceSession){return null}
+        console.log(4,addBlackList)
         return addBlackList
     },
     async checkBlackList(token:string){

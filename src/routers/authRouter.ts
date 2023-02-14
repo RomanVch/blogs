@@ -89,8 +89,8 @@ authRouter.post('/registration-confirmation',
     )
 
 authRouter.post("/registration-email-resending",
-    validResentBodyEmail('email'),
     limitAttempts,
+    validResentBodyEmail('email'),
     errorsValidatorMiddleware,
     async (req, res) => {
         const {email} = req.body
@@ -139,9 +139,15 @@ authRouter.post('/logout',
         }
         const token = req.cookies.refreshToken;
         const ids = await jwtService.getUserIdByToken(token,'refresh')
-        if(!ids){res.status(401).send()}
+        if(!ids){
+            res.status(401).send()
+            return
+        }
         const deleteToken = ids && await authService.logout(token);
-        if(!deleteToken) {res.status(401).send()}
+        if(!deleteToken) {
+            res.status(401).send()
+            return
+        }
         res.clearCookie('refreshToken');
         res.status(204).send()
     }catch (e) {
