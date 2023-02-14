@@ -19,7 +19,7 @@ import rateLimit from "express-rate-limit";
 // Создаем лимит на количество запросов для защищенного эндпоинта
 const apiLimiter = rateLimit({
     windowMs: 10 * 1000, // Время окна (1 минута)
-    max: 4, // Максимальное количество запросов в окне
+    max: 5, // Максимальное количество запросов в окне
 });
 
 export const authRouter = Router({});
