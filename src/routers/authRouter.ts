@@ -39,6 +39,7 @@ authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
     errorsValidatorAuthMiddleware,
+    rateLimit,
     async (req:Request, res:Response):Promise<any> => {
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
@@ -49,7 +50,6 @@ authRouter.post('/login',
             res.sendStatus(401)
         }
         else {
-            rateLimit()
             const token = await authService.getTokens(deviceSession.deviceId)
             if(token){
                 res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
@@ -63,12 +63,12 @@ authRouter.post('/registration',
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
     errorsValidatorMiddleware,
+    rateLimit,
     async (req:Request, res:Response):Promise<any> => {
         const {login,password,email} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
         if(!ip || !userAgent){ return res.sendStatus(400) }
-        rateLimit()
             const addUser = await usersService.addUser({login,password,email,userAgent,ip:ip as string})
               if(addUser){
                   const emailCheck = await emailManager.sendConfirmationEmail(email,addUser.confirmationCode)
@@ -86,9 +86,9 @@ authRouter.post('/registration',
 authRouter.post('/registration-confirmation',
     validBodyString("code",8,100),
     errorsValidatorMiddleware,
+    rateLimit,
     async (req:Request, res:Response) => {
         const {code} = req.body
-        rateLimit()
         const checkConfirmationUser = await authService.registrationConfirmation(code as string)
         generators.messageRes({res,...checkConfirmationUser})
         }
@@ -97,9 +97,9 @@ authRouter.post('/registration-confirmation',
 authRouter.post("/registration-email-resending",
     validResentBodyEmail('email'),
     errorsValidatorMiddleware,
+    rateLimit,
     async (req:Request, res:Response) => {
         const {email} = req.body
-        rateLimit()
         const checkingEmail = await authService.resendingRegistrationEmail(email)
         generators.messageRes({res,...checkingEmail})
 })
@@ -126,9 +126,9 @@ authRouter.post('/refresh-token',
             res.status(400).send()
             return
         }
-        rateLimit()
         const updateDeviceSession = await usersService.newEnterDeviceSession(ids.userId.toString(),ids.deviceId);
         if(!updateDeviceSession){ return null }
+
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
             res.status(200).send({accessToken:newTokens.accessToken});
     }catch (err) {
