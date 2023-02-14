@@ -14,7 +14,6 @@ import {auth} from "../middlewares/auth";
 const usersRouter = Router({});
 
 export type UsersQueryT = {
-
         sortBy?:string,
         sortDirection?: "asc" | "desc",
         pageSize?:number,
@@ -45,7 +44,7 @@ usersRouter.post('/',
     validBodyString('password',6,20),
     validBodyEmail('email',1,100),
     errorsValidatorMiddleware,
-    async (req, res) => {
+    async (req, res):Promise<any> => {
             const {login,password,email} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']

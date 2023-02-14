@@ -1,34 +1,13 @@
 import express from "express"
-import bodyParser from "body-parser"
-import cookieParser from  "cookie-parser"
-import blogsRouter from "./routers/blogsRouter";
-import {testingAllDataRouter} from "./routers/testingAllDataRouters";
 import {runDb} from "./repository/dataBase";
-import usersRouter from "./routers/usersRouter";
-import {authRouter} from "./routers/authRouter";
-import {commentsRouter} from "./routers/commentsRouter";
-import {securityDevicesRouter} from "./routers/securityDevicesRouter";
-import {postRouter} from "./routers/postRouter";
-
-export const app = express()
-const port = 3003
-
-const parserMiddleware = bodyParser.json();
+import {app, port} from "./initApp";
 
 
-app.use(parserMiddleware)
-    .use(cookieParser())
-    .set('trust proxy', true)
-    .use("/posts", postRouter)
-    .use("/blogs", blogsRouter)
-    .use("/users", usersRouter)
-    .use("/auth", authRouter)
-    .use("/comments", commentsRouter)
-    .use("/security", securityDevicesRouter)
-    .use("/testing/all-data",testingAllDataRouter)
-
-
-app.listen(port, async () => {
+const startApp = async () => {
     await runDb()
-    console.log(`Example app listening on port ${port}`)
-})
+    app.listen(port, async () => {
+        console.log(`Example app listening on port ${port}`)
+    })
+}
+
+startApp()

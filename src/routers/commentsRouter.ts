@@ -23,7 +23,7 @@ commentsRouter.put('/:id',
     validBodyString('content',20,300),
     validParamCommentId(),
     errorsValidatorMiddleware,
-    async (req, res) => {
+    async (req, res):Promise<any> => {
         const id = req.params.id;
         const comment = await commentsService.getCommentById(id)
         const user = req.user

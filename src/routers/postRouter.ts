@@ -32,7 +32,7 @@ postRouter.get('/',
     validQueryString('sortBy'),
     validQuerySortDirection(),
     errorsValidatorMiddleware,
-    async(req: Request<unknown,unknown,unknown,PostsQueryT>, res) => {
+    async(req: Request<unknown,unknown,unknown,PostsQueryT>, res):Promise<any> => {
         const { pageSize=10, pageNumber=1, sortBy="createdAt", sortDirection='desc'} = req.query
         const query = {pageSize,pageNumber,sortBy,sortDirection};
         const posts = await postService.getPosts(query)
@@ -80,6 +80,7 @@ postRouter.post('/',
     validBodyString('title'),
     errorsValidatorMiddleware,
  async (req, res) => {
+     console.log(1111)
     const {title,shortDescription,content,blogId} = req.body
     const newPost = await postService.addPost({title,shortDescription,content,blogId})
      if(newPost){

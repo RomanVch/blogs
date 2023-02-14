@@ -18,7 +18,7 @@ import {settings} from "../application/setting";
 export const authRouter = Router({});
 
 
-authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res) => {
+authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res):Promise<any> => {
  try{
      const user = await usersService.getUserById(new ObjectId(req.user!.id))
      if(!user){ return res.status(404).send()}
@@ -32,17 +32,17 @@ authRouter.post('/login',
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
     errorsValidatorAuthMiddleware,
-    async (req, res) => {
+    async (req, res):Promise<any> => {
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
         if(!ip || !userAgent){ return res.sendStatus(400) }
-        const user = await authService.auth({loginOrEmail, password,userAgent,ip:ip as string});
-        if (!user) {
+        const deviceSession = await authService.auth({loginOrEmail, password,userAgent,ip:ip as string});
+        if (!deviceSession) {
             res.sendStatus(401)
         }
         else {
-            const token = await authService.getTokens(user.devicesSessions[0].deviceId)
+            const token = await authService.getTokens(deviceSession.deviceId)
             if(token){
                 res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: settings.SCOPE === 'production' });
                 res.status(200).send({accessToken:token.accessToken});
@@ -55,7 +55,7 @@ authRouter.post('/registration',
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
     errorsValidatorMiddleware,
-    async (req, res) => {
+    async (req, res):Promise<any> => {
         const {login,password,email} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
@@ -95,7 +95,7 @@ authRouter.post("/registration-email-resending",
 
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
-    async (req, res) => {
+    async (req, res):Promise<any> => {
     try {
         if(!req.cookies.refreshToken){
             res.sendStatus(401)

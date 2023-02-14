@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router,Request,Response } from "express";
 import {errorsValidatorMiddleware} from "../middlewares/errors-middlewares";
 import {authJwt} from "../middlewares/authJwt";
 import {usersService} from "../domain/users-service";
@@ -32,7 +32,7 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
             return {lastActiveDate: session.lastActiveDate,deviceId: session.deviceId,title: session.title, ip:session.ip}
         }));
     })
-securityDevicesRouter.delete('/devices', errorsValidatorMiddleware, async (req, res) => {
+securityDevicesRouter.delete('/devices', errorsValidatorMiddleware, async (req, res):Promise<any> => {
     const { cookies: { refreshToken: token }, ip, headers: { 'user-agent': userAgent } } = req;
     const ids = await jwtService.getUserIdByToken(token, 'refresh');
     if (!ids || !ip || !userAgent) return res.status(401).send();
