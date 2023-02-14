@@ -1,4 +1,4 @@
-import {Router} from "express";
+import {Request, Response, Router} from "express";
 import {
     validBodyEmail,
     validBodyLogin,
@@ -17,10 +17,10 @@ import {settings} from "../application/setting";
 import rateLimit from "express-rate-limit";
 
 // Создаем лимит на количество запросов для защищенного эндпоинта
-const apiLimiter = rateLimit({
+/*const apiLimiter = rateLimit({
     windowMs: 10 * 1000, // Время окна (1 минута)
     max: 5, // Максимальное количество запросов в окне
-});
+});*/
 
 export const authRouter = Router({});
 
@@ -36,11 +36,11 @@ authRouter.get('/me',authJwt,errorsValidatorMiddleware,async (req, res):Promise<
  }
 })
 authRouter.post('/login',
-    apiLimiter,
     validLoginOrEmail(3,10,"have"),
     validBodyString('password',6,15),
     errorsValidatorAuthMiddleware,
-    async (req, res):Promise<any> => {
+    rateLimit,
+    async (req:Request, res:Response):Promise<any> => {
         const {loginOrEmail,password} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
@@ -63,8 +63,8 @@ authRouter.post('/registration',
     validBodyString('password',6,20),
     validBodyEmail('email',4,1000),
     errorsValidatorMiddleware,
-    apiLimiter,
-    async (req, res):Promise<any> => {
+    rateLimit,
+    async (req:Request, res:Response):Promise<any> => {
         const {login,password,email} = req.body
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         const userAgent = req.headers['user-agent']
@@ -86,8 +86,8 @@ authRouter.post('/registration',
 authRouter.post('/registration-confirmation',
     validBodyString("code",8,100),
     errorsValidatorMiddleware,
-    apiLimiter,
-    async (req, res) => {
+    rateLimit,
+    async (req:Request, res:Response) => {
         const {code} = req.body
         const checkConfirmationUser = await authService.registrationConfirmation(code as string)
         generators.messageRes({res,...checkConfirmationUser})
@@ -97,8 +97,8 @@ authRouter.post('/registration-confirmation',
 authRouter.post("/registration-email-resending",
     validResentBodyEmail('email'),
     errorsValidatorMiddleware,
-    apiLimiter,
-    async (req, res) => {
+    rateLimit,
+    async (req:Request, res:Response) => {
         const {email} = req.body
         const checkingEmail = await authService.resendingRegistrationEmail(email)
         generators.messageRes({res,...checkingEmail})
