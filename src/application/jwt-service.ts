@@ -13,10 +13,12 @@ export const jwtService = {
     },
     async getUserIdByToken(token:string|undefined,secret?:string):Promise<{userId:ObjectId,deviceId:string}|null>{
         try {
+            console.log(token)
             if(!token) { return null}
             let deviceId:any
             if(!secret) {
                 deviceId = jwt.verify(token, settings.JWT_SECRET)
+                console.log(321)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
                 if(!user) {return null}
                 return {userId:user._id,deviceId:deviceId.deviceId}
@@ -25,7 +27,7 @@ export const jwtService = {
                 if(!checkBlackList){
                     return null }
                 deviceId = jwt.verify(token, settings.REFRESH_TOKEN_SECRET)
-                console.log(deviceId)
+                console.log(deviceId,1234)
                 const user = await usersService.getUserMongoByDeviceId(deviceId.deviceId)
                 if(!user) { console.error('userGet',user,'token',deviceId.deviceId)
                     return null}

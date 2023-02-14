@@ -15,6 +15,7 @@ import {jwtService} from "../application/jwt-service";
 import {infoBackDbRepository} from "../repository/infoBack-db-repository";
 import {getDeviceSession} from "../utils/getDeviceSession";
 import {usersService} from "./users-service";
+import {securityDevicesService} from "./security-devices-service";
 
 export const authService = {
     async auth(auth:{loginOrEmail:string,password:string,userAgent:string,ip:string}): Promise<UserDevicesSessionsT | null> {
@@ -71,8 +72,10 @@ export const authService = {
     },
     async logout(oldToken:string){
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
-
-        if(!addBlackList){return null}
+        const ids = await jwtService.getUserIdByToken(oldToken,'refresh')
+        if(!ids){return null}
+        const checkRemoveDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(), ids.deviceId);
+        if(!addBlackList || !checkRemoveDeviceSession){return null}
         return addBlackList
     },
     async checkBlackList(token:string){
