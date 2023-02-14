@@ -30,7 +30,7 @@ securityDevicesRouter.get('/devices',errorsValidatorMiddleware,
         }
         res.status(200).send(user?.devicesSessions.map((session)=>{
             return {lastActiveDate: session.lastActiveDate,deviceId: session.deviceId,title: session.title, ip:session.ip}
-        }).filter((session)=>session.title !== "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"));
+        }));
     })
 securityDevicesRouter.delete('/devices', errorsValidatorMiddleware, async (req, res):Promise<any> => {
     const { cookies: { refreshToken: token }, ip, headers: { 'user-agent': userAgent } } = req;

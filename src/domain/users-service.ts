@@ -61,7 +61,7 @@ export const usersService = {
                 expirationDate,
                 confirmationCode
         },
-            devicesSessions:[getDeviceSession(userAgent,ip)]
+            devicesSessions:[]
         }
         const userForUi = await usersDbRepository.addUser(newUser)
         return {user:userForUi,confirmationCode};
