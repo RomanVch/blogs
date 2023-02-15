@@ -18,8 +18,11 @@ import rateLimit from "express-rate-limit";
 
 // Создаем лимит на количество запросов для защищенного эндпоинта
 const apiLimiter = rateLimit({
-    windowMs: 10 * 1000, // Время окна (1 минута)
-    max: 5, // Максимальное количество запросов в окне
+    windowMs: 10 * 1000,
+    max: 5,
+    keyGenerator: function(req) {
+        return req.path; // генерируем ключ на основе URL
+    }
 });
 
 export const authRouter = Router({});
