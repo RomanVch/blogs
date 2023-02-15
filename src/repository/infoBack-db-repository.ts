@@ -29,6 +29,9 @@ export const infoBackDbRepository = {
     async findTokenInBlackList(token:string):Promise<boolean>{
         try{
             const tokenFind = await infoBackDb.findOne({})
+            if(tokenFind && !tokenFind.blackList.length){
+                return false
+            }
             return !!tokenFind?.blackList.includes(token)
         } catch(e){
             console.error(e)

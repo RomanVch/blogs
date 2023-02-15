@@ -149,7 +149,8 @@ authRouter.post('/logout',
             res.status(401).send()
             return
         }
-        const deleteToken = ids && await authService.logout(token);
+        const deleteToken = ids && await authService.logout(token,ids);
+
         if(!deleteToken) {
             res.status(401).send()
             return

@@ -62,13 +62,10 @@ describe('POST /registration', () => {
            const req = await request(app).post("/auth/login").set(commonHeaders(userAgent[0])).send({loginOrEmail: user.login, password: user.password})
            expect(req.statusCode).toBe(200)
         device[userAgent[0]] = req.header["set-cookie"][0].replace("refreshToken=", "").replace("; Path=/; HttpOnly","")
-        console.error(req.header["set-cookie"][0].replace("refreshToken=", ""))
-        console.error(commonHeaders(userAgent[1]))
 
                const req1 = await request(app).post("/auth/login").set(commonHeaders(userAgent[1])).send({loginOrEmail: user.login, password: user.password})
             expect(req1.statusCode).toBe(200)
         device[userAgent[1]] = req1.header["set-cookie"][0].replace("refreshToken=", "").replace("; Path=/; HttpOnly","")
-        console.error(req1.header["set-cookie"][0].replace("refreshToken=", ""))
 
         const req2 = await request(app).post("/auth/login").set(commonHeaders(userAgent[2])).send({loginOrEmail: user.login, password: user.password})
             expect(req2.statusCode).toBe(200)
@@ -77,7 +74,6 @@ describe('POST /registration', () => {
             const req3 = await request(app).post("/auth/login").set(commonHeaders(userAgent[3])).send({loginOrEmail: user.login, password: user.password})
             expect(req3.statusCode).toBe(200)
         device[userAgent[3]] = req3.header["set-cookie"][0].replace("refreshToken=", "").replace("; Path=/; HttpOnly","")
-        console.error(device)
         });
 
     it('удаляем все девайс сессии',async ()=>{
@@ -147,14 +143,21 @@ describe('AUTH /logout', () => {
         refreshToken = req.header["set-cookie"][0]
     })
     it("Выходим", async () => {
-        console.log(refreshToken,commonHeaders(userAgent[0],refreshToken))
         const req = await request(app).post("/auth/logout").set(commonHeaders(userAgent[0],refreshToken)).send()
+        expect(req.statusCode).toBe(204)
+    })
+    it("Логинемся", async () => {
+        const req = await request(app).post("/auth/login").set(commonHeaders(userAgent[1])).send({
+            loginOrEmail: user.login,
+            password: user.password
+        })
         expect(req.statusCode).toBe(200)
+        refreshToken = req.header["set-cookie"][0]
     })
     it("Проверяем что девайс сессии пустые", async () => {
-        const req = await request(app).get("/security/devices").set(commonHeaders(userAgent[0],refreshToken)).send()
+        const req = await request(app).get("/security/devices").set(commonHeaders(userAgent[1],refreshToken)).send()
        expect(req.statusCode).toBe(200)
-       expect(req.body.length).toBe(0)
+       expect(req.body.length).toBe(1)
     })
 
 });

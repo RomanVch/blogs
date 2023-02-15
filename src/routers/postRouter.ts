@@ -25,7 +25,6 @@ export type PostsQueryT = {
 
 export const postRouter = Router();
 
-console.log('hello')
 postRouter.get('/',
     validQueryNumber('pageSize'),
     validQueryNumber('pageNumber'),
@@ -80,7 +79,6 @@ postRouter.post('/',
     validBodyString('title'),
     errorsValidatorMiddleware,
  async (req, res) => {
-     console.log(1111)
     const {title,shortDescription,content,blogId} = req.body
     const newPost = await postService.addPost({title,shortDescription,content,blogId})
      if(newPost){

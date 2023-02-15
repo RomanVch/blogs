@@ -1,21 +1,15 @@
 import {usersDbRepository} from "../repository/users-db-repository";
 import bcrypt from "bcrypt";
-import {
-    AccessTokenT,
-    RefreshTokenT,
-    UserDevicesSessionsBaseT,
-    UserDevicesSessionsT,
-    UserMongoIdT
-} from "../repository/types";
+import {AccessTokenT, RefreshTokenT, UserDevicesSessionsT} from "../repository/types";
 import {BodyForMessageT, MessageForResT} from "../utils/generators";
 import {emailManager} from "../manager/email-manager";
-import { v4 as uuidv4 } from 'uuid';
-import {ObjectId} from "mongodb";
+import {v4 as uuidv4} from 'uuid';
 import {jwtService} from "../application/jwt-service";
 import {infoBackDbRepository} from "../repository/infoBack-db-repository";
 import {getDeviceSession} from "../utils/getDeviceSession";
 import {usersService} from "./users-service";
 import {securityDevicesService} from "./security-devices-service";
+import {ObjectId} from "mongodb";
 
 export const authService = {
     async auth(auth:{loginOrEmail:string,password:string,userAgent:string,ip:string}): Promise<UserDevicesSessionsT | null> {
@@ -70,21 +64,13 @@ export const authService = {
         if(!addBlackList){return null}
         return refreshToken
     },
-    async logout(oldToken:string){
-        console.log('start',oldToken)
+    async logout(oldToken:string,ids:{userId:ObjectId,deviceId:string}){
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
-        console.log(1,addBlackList)
-        const ids = await jwtService.getUserIdByToken(oldToken,'refresh')
-        console.log(2,ids)
-        if(!ids){return null}
         const checkRemoveDeviceSession = await securityDevicesService.removeIdDeviceSession(ids.userId.toString(), ids.deviceId);
-        console.log(3,checkRemoveDeviceSession)
         if(!addBlackList || !checkRemoveDeviceSession){return null}
-        console.log(4,addBlackList)
         return addBlackList
     },
     async checkBlackList(token:string){
-        const boolBlackList = await infoBackDbRepository.findTokenInBlackList(token)
-        return !boolBlackList
+        return infoBackDbRepository.findTokenInBlackList(token)
     }
 }
