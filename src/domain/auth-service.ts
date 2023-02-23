@@ -49,7 +49,7 @@ export const authService = {
     },
     async passwordRecoveryEmail (email:string): Promise<MessageForResT<BodyForMessageT>>{
         const user = await usersDbRepository.getUserEmail(email)
-        if(!user){ return {code:400,body: [{message:'not found',field:'email'}]}}
+        if(!user){ return {code:204}}
 
         const uuid = uuidv4()
         const changeCode = await usersDbRepository.changeUserPasswordCode(user._id.toString(), uuid)
