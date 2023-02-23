@@ -99,7 +99,7 @@ export const usersDbRepository = {
     },
     async changeUserPassword(id:string,passwordHash:string,passwordSalt:string):Promise<boolean>{
         try{
-            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: null,passwordSalt: passwordSalt,passwordHash: passwordHash}})
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: "",passwordSalt: passwordSalt,passwordHash: passwordHash}})
             return true
         } catch(e){
             console.error(e)

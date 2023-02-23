@@ -25,7 +25,7 @@ const userSchema = new Schema<UserForBaseIdT>({
     createdAt: {type:String,required:true},
     passwordHash:{type:String,required:true},
     passwordSalt:{type:String,required:true},
-    passwordRecoveryCode:{type:String,required:true},
+    passwordRecoveryCode:{type:String},
     emailConfirmation:{type:{
         isConfirmed:Boolean,
         expirationDate:Date,
