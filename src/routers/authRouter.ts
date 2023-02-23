@@ -122,8 +122,8 @@ authRouter.post("/new-password",
     apiLimiter,
     async (req, res) => {
         const {newPassword, recoveryCode} = req.body
-        const checkingChangePasword = await authService.changePassword(newPassword, recoveryCode)
-        generators.messageRes({res,...checkingChangePasword})
+        const checkingChangePassword = await authService.changePassword(newPassword, recoveryCode)
+        generators.messageRes({res,...checkingChangePassword})
     })
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
