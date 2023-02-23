@@ -78,7 +78,7 @@ export const authService = {
     },
     async changePassword (newPassword:string, code:string){
         const user = await usersDbRepository.getUserByChangePasswordCode(code)
-        if(!user){ return {code:400,body: [{message:'not found',field:''}]}}
+        if(!user){ return {code:400,body: [{message:'not found',field:'recoveryCode'}]}}
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
         const checkChangePassword = await usersDbRepository.changeUserPassword(user.id,passwordSalt,passwordHash)
