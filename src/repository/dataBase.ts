@@ -1,5 +1,4 @@
-import {DataBaseT} from "./types";
-import {MongoClient} from "mongodb";
+import  mongoose from "mongoose";
 import * as dotenv from 'dotenv'
 dotenv.config()
 
@@ -9,15 +8,18 @@ if(!mongoURL){
     throw new Error('! Url not found')
 }
 
-export const client = new MongoClient(mongoURL.toString())
+//export const client = new MongoClient(mongoURL.toString())
+
 
 export async function runDb(){
+    const dbName = 'blogs';
     try{
-        await client.connect()
-        await client.db('blogs').command({ping:1})
-        console.log("Connected successfully to mongo server")
+     await mongoose.connect(mongoURL+'/'+ dbName, {
+         writeConcern: { w: 'majority' },
+     })
+         console.log("Connected successfully to mongo server")
     } catch (e) {
         console.log("can't connect to mongo server")
-        await client.close()
+        await mongoose.disconnect();
     }
 }

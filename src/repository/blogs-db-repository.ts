@@ -1,10 +1,10 @@
-import {client} from "./dataBase";
 import {BlogMongoIdT, BlogSimpleIdT, BlogT, CorrectBlogT} from "./types";
 import {ObjectId, WithId} from "mongodb";
 import {BlogsQueryT, EndRouterT} from "../routers/blogsRouter";
 import {mapper} from "../utils/mapper";
+import {blogsModel} from "./Schemas";
 
-const blogDb = client.db("blogs").collection<BlogMongoIdT>("blogs")
+//const blogsModel = client.db("blogs").collection<BlogMongoIdT>("blogs")
 
 export const blogsDbRepository = {
     async getBlogs(blogsQuery:BlogsQueryT):Promise<EndRouterT<BlogSimpleIdT[]>|null> {
@@ -13,13 +13,13 @@ export const blogsDbRepository = {
             const direction = blogsQuery.sortDirection === "desc"? -1 : 1;
             if(!blogsQuery.sortDirection) return null
             const regex = new RegExp(`${blogsQuery.searchNameTerm}`, "i");
-            const blogs = await blogDb
+            const blogs = await blogsModel
                 .find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') })
                 .skip(skip)
                 .limit(blogsQuery.pageSize)
                 .sort({[blogsQuery.sortBy]:direction})
-                .toArray()
-            const blogsCount = await blogDb.find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') }).count();
+             
+            const blogsCount = await blogsModel.find({name:blogsQuery.searchNameTerm ? {$regex:regex}:new RegExp('', 'g') }).count();
             return {
                 pagesCount: Math.ceil(blogsCount / blogsQuery.pageSize),
                 page: blogsQuery.pageNumber,
@@ -31,12 +31,12 @@ export const blogsDbRepository = {
         return null
     },
         async getBlogId(id:string):Promise<WithId<BlogT>|null> {
-            return  blogDb.findOne({_id: new ObjectId(id)})
+            return  blogsModel.findOne({_id: new ObjectId(id)})
     },
     async addBlog(newBlog:BlogT): Promise<BlogSimpleIdT>{
-        const result = await client.db('blogs').collection("blogs").insertOne(newBlog);
+        const result = await blogsModel.create(newBlog);
         return {
-            id:result.insertedId.toString(),
+            id:result._id.toString(),
             name: newBlog.name,
             description: newBlog.description,
             websiteUrl: newBlog.websiteUrl,
@@ -45,11 +45,11 @@ export const blogsDbRepository = {
     },
     async correctBlog(correctBlog:CorrectBlogT):Promise<boolean> {
         const {id,description,websiteUrl,name}= correctBlog;
-        const blog = await blogDb.updateOne({_id:new ObjectId(id)},{$set: {name,description,websiteUrl}});
+        const blog = await blogsModel.updateOne({_id:new ObjectId(id)},{$set: {name,description,websiteUrl}});
         return blog.matchedCount === 1;
     },
     async delBlog(id:string){
-        const result = await blogDb.deleteOne({_id:new ObjectId(id)})
+        const result = await blogsModel.deleteOne({_id:new ObjectId(id)})
         return result.deletedCount === 1;}
 }
 

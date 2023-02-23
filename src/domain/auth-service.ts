@@ -33,7 +33,6 @@ export const authService = {
             return {code:204}
         } else {return {code:400,body:[{message:'not confirmed',field:'code'}]}}
             },
-
     async resendingRegistrationEmail (email:string): Promise<MessageForResT<BodyForMessageT>>{
         const user = await usersDbRepository.getUserEmail(email)
         if(!user){ return {code:400,body: [{message:'not found',field:'email'}]}}
@@ -44,6 +43,19 @@ export const authService = {
         if(!changeCode){ return {code:400,body: [{message:'email dont send.',field:'email'}]}}
 
         const emailSend = await emailManager.sendConfirmationEmail(email,uuid)
+        if(!emailSend){return {code:400,body: [{message:'email dont send',field:'email'}]}}
+
+        return {code:204}
+    },
+    async passwordRecoveryEmail (email:string): Promise<MessageForResT<BodyForMessageT>>{
+        const user = await usersDbRepository.getUserEmail(email)
+        if(!user){ return {code:400,body: [{message:'not found',field:'email'}]}}
+
+        const uuid = uuidv4()
+        const changeCode = await usersDbRepository.changeUserPasswordCode(user._id.toString(), uuid)
+        if(!changeCode){ return {code:400,body: [{message:'dont change code password',field:'email'}]}}
+
+        const emailSend = await emailManager.sendRecoveryPaswordCodeEmail(email,uuid)
         if(!emailSend){return {code:400,body: [{message:'email dont send',field:'email'}]}}
 
         return {code:204}
@@ -63,6 +75,15 @@ export const authService = {
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)
         if(!addBlackList){return null}
         return refreshToken
+    },
+    async changePassword (newPassword:string, code:string){
+        const user = await usersDbRepository.getUserByConfirmedCode(code)
+        if(!user){ return {code:400,body: [{message:'not found',field:''}]}}
+        const passwordSalt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
+        const checkChangePassword = await usersDbRepository.changeUserPassword(user.id,passwordSalt,passwordHash)
+        if(!checkChangePassword){return {code:400,body: [{message:'not change password',field:'password'}]}}
+        return {code:204}
     },
     async logout(oldToken:string,ids:{userId:ObjectId,deviceId:string}){
         const addBlackList = await infoBackDbRepository.addTokenInBlackList(oldToken)

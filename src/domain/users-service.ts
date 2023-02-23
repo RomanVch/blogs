@@ -56,6 +56,7 @@ export const usersService = {
             createdAt:dateNow.toISOString(),
             passwordHash,
             passwordSalt,
+            passwordRecoveryCode:null,
             emailConfirmation:{
              isConfirmed:false,
                 expirationDate,

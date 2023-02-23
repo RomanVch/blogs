@@ -1,19 +1,13 @@
-import {client} from "./dataBase";
-import {InfoServerT, UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "./types";
-import {EndRouterT} from "../routers/blogsRouter";
-import {mapper} from "../utils/mapper";
-import {UsersQueryT} from "../routers/usersRouter";
-import {ObjectId} from "mongodb";
-import {tr} from "date-fns/locale";
+import {infoBackModel} from "./Schemas";
 
-const infoBackDb = client.db("blogs").collection<InfoServerT>("infoBack")
+const infoBackDb = infoBackModel //client.db("blogs").collection<InfoServerT>("infoBack")
 
 export const infoBackDbRepository = {
     async addTokenInBlackList(oldToken:string):Promise<boolean>{
         try{
             const checkBlackList = await infoBackDb.findOne({});
             if(!checkBlackList){
-                await infoBackDb.insertOne({blackList:[oldToken]});
+                await infoBackDb.create({blackList:[oldToken]});
             }else{
                 if(!checkBlackList._id){
                     return false;

@@ -1,12 +1,11 @@
-import {client} from "./dataBase";
 import {UserDevicesSessionsBaseT, UserForBaseIdT, UserMongoIdT, UserSimpleIdT} from "./types";
 import {EndRouterT} from "../routers/blogsRouter";
 import {mapper} from "../utils/mapper";
 import {UsersQueryT} from "../routers/usersRouter";
 import {ObjectId} from "mongodb";
-import {settings} from "../application/setting";
+import {usersModel} from "./Schemas";
 
-const usersDb = client.db("blogs").collection<UserMongoIdT>("users")
+const usersDb = usersModel //client.db("blogs").collection<UserMongoIdT>("users")
 
 export const usersDbRepository = {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
@@ -23,7 +22,6 @@ export const usersDbRepository = {
                 .skip(skip)
                 .limit(usersQuery.pageSize)
                 .sort({[usersQuery.sortBy]:direction})
-                .toArray()
             const blogsCount = await usersDb
                 .find({$or: [{login: getRegex(usersQuery.searchLoginTerm)}, {email: getRegex(usersQuery.searchEmailTerm )}]})
                 .count();
@@ -46,7 +44,6 @@ export const usersDbRepository = {
     },
     async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
         const user = await usersDb.findOne({"emailConfirmation.confirmationCode": code})
-
         if(user){
             return {
                 id:user._id.toString(),
@@ -54,6 +51,20 @@ export const usersDbRepository = {
                 email: user.email,
                 createdAt: user.createdAt,
                 isConfirmed:user.emailConfirmation.isConfirmed
+            }
+        } else{
+            return null
+        }
+    },
+    async getUserByChangePasswordCode(code:string):Promise<UserSimpleIdT & {passwordRecoveryCode:string}|null>{
+        const user = await usersDb.findOne({passwordRecoveryCode: code})
+        if(user && user.passwordRecoveryCode){
+            return {
+                id:user._id.toString(),
+                login: user.login,
+                email: user.email,
+                createdAt: user.createdAt,
+                passwordRecoveryCode:user.passwordRecoveryCode
             }
         } else{
             return null
@@ -77,6 +88,24 @@ export const usersDbRepository = {
             return false
         }
     },
+    async changeUserPasswordCode(id:string,code:string):Promise<boolean>{
+        try{
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: code}})
+            return true
+        } catch(e){
+            console.error(e)
+            return false
+        }
+    },
+    async changeUserPassword(id:string,passwordHash:string,passwordSalt:string):Promise<boolean>{
+        try{
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: null,passwordSalt: passwordSalt,passwordHash: passwordHash}})
+            return true
+        } catch(e){
+            console.error(e)
+            return false
+        }
+    },
     async getUserLogin(login:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({login})
     },
@@ -87,9 +116,9 @@ export const usersDbRepository = {
         return  usersDb.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
     },
     async addUser(newUser:UserForBaseIdT): Promise<UserSimpleIdT>{
-        const result = await client.db('blogs').collection('users').insertOne(newUser);
+        const result = await usersDb.create(newUser);
         return {
-            id:result.insertedId.toString(),
+            id:result._id.toString(),
             login: newUser.login,
             email: newUser.email,
             createdAt: newUser.createdAt,

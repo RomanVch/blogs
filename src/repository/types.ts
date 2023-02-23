@@ -1,5 +1,6 @@
 import {ObjectId, WithId} from "mongodb";
 import add from "date-fns/add";
+import {Schema} from "inspector";
 
 export type PostT = {
     title: string,
@@ -52,7 +53,7 @@ export type UserDevicesSessionsT =   {
 export type UserDevicesSessionsBaseT =   UserDevicesSessionsT & {
     lastActiveDate: string,
 }
-export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, emailConfirmation:{
+export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, passwordRecoveryCode:string|null, emailConfirmation:{
         isConfirmed:boolean,
         expirationDate:Date,
         confirmationCode:string,

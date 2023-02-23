@@ -106,7 +106,25 @@ authRouter.post("/registration-email-resending",
         const checkingEmail = await authService.resendingRegistrationEmail(email)
         generators.messageRes({res,...checkingEmail})
 })
-
+authRouter.post("/password-recovery",
+    validResentBodyEmail('email'),
+    errorsValidatorMiddleware,
+    apiLimiter,
+    async (req, res) => {
+        const {email} = req.body
+        const checkingEmail = await authService.passwordRecoveryEmail(email)
+        generators.messageRes({res,...checkingEmail})
+    })
+authRouter.post("/new-password",
+    validBodyString('newPassword'),
+    validBodyString('recoveryCode'),
+    errorsValidatorMiddleware,
+    apiLimiter,
+    async (req, res) => {
+        const {newPassword, recoveryCode} = req.body
+        const checkingChangePasword = await authService.changePassword(newPassword, recoveryCode)
+        generators.messageRes({res,...checkingChangePasword})
+    })
 authRouter.post('/refresh-token',
     errorsValidatorMiddleware,
     async (req, res):Promise<any> => {
