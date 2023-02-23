@@ -116,8 +116,8 @@ authRouter.post("/password-recovery",
         generators.messageRes({res,...checkingEmail})
     })
 authRouter.post("/new-password",
-    validBodyString('newPassword'),
-    validBodyString('recoveryCode'),
+    validBodyString('newPassword',6,50),
+    validBodyString('recoveryCode',6,100),
     errorsValidatorMiddleware,
     apiLimiter,
     async (req, res) => {
