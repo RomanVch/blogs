@@ -17,6 +17,7 @@ export const authService = {
         const user = await usersDbRepository.getUserByLoginOrEmail(loginOrEmail)
         if (!user) { return null }
             const passwordHash = await bcrypt.hash(password,user.passwordSalt)
+        console.log(passwordHash, user.passwordHash, user.passwordSalt )
             if(user.passwordHash !== passwordHash) { return null }
             const deviceSession = getDeviceSession(userAgent,ip);
             const updateDeviceSession = await usersService.addDevicesSessions(user._id.toString(),deviceSession)
@@ -81,7 +82,7 @@ export const authService = {
         if(!user){ return {code:400,body: [{message:'not found',field:'recoveryCode'}]}}
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
-        const checkChangePassword = await usersDbRepository.changeUserPassword(user.id,passwordSalt,passwordHash)
+        const checkChangePassword = await usersDbRepository.changeUserPassword(user.id,passwordHash,passwordSalt)
         if(!checkChangePassword){return {code:400,body: [{message:'not change password',field:'password'}]}}
         return {code:204}
     },
