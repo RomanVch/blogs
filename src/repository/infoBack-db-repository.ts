@@ -2,7 +2,7 @@ import {infoBackModel} from "./Schemas";
 
 const infoBackDb = infoBackModel //client.db("blogs").collection<InfoServerT>("infoBack")
 
-export const infoBackDbRepository = {
+class InfoBackDbRepository  {
     async addTokenInBlackList(oldToken:string):Promise<boolean>{
         try{
             const checkBlackList = await infoBackDb.findOne({});
@@ -19,7 +19,7 @@ export const infoBackDbRepository = {
             console.error(e)
             return false
         }
-    },
+    }
     async findTokenInBlackList(token:string):Promise<boolean>{
         try{
             const tokenFind = await infoBackDb.findOne({})
@@ -31,5 +31,8 @@ export const infoBackDbRepository = {
             console.error(e)
             return true
         }
-    },
+    }
 }
+
+
+export const infoBackDbRepository = new InfoBackDbRepository;

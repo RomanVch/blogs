@@ -7,7 +7,7 @@ import {usersModel} from "./Schemas";
 
 const usersDb = usersModel //client.db("blogs").collection<UserMongoIdT>("users")
 
-export const usersDbRepository = {
+export class UsersDbRepository {
     async getUsers(usersQuery:UsersQueryT):Promise<EndRouterT<UserSimpleIdT[]>|null> {
         if(usersQuery.pageNumber && usersQuery.pageSize && usersQuery.sortBy){
             const skip = (usersQuery.pageNumber -1) * usersQuery.pageSize;
@@ -16,7 +16,7 @@ export const usersDbRepository = {
                 if(name){
                     return new RegExp(`${name}`, "i")}
                 return new RegExp(``, "i")
-                }
+            }
             const users = await usersDb
                 .find({$or: [{login: getRegex(usersQuery.searchLoginTerm)}, {email: getRegex(usersQuery.searchEmailTerm )}]})
                 .skip(skip)
@@ -35,13 +35,13 @@ export const usersDbRepository = {
             };
         }
         return null
-    },
+    }
     async getUserById(id:ObjectId){
         return usersDb.findOne({_id: id})
-    },
+    }
     async getUserByDeviceId(deviceId:string){
         return usersDb.findOne({'devicesSessions.deviceId': deviceId})
-    },
+    }
     async getUserByConfirmedCode(code:string):Promise<UserSimpleIdT & {isConfirmed:boolean}|null>{
         const user = await usersDb.findOne({"emailConfirmation.confirmationCode": code})
         if(user){
@@ -55,7 +55,7 @@ export const usersDbRepository = {
         } else{
             return null
         }
-    },
+    }
     async getUserByChangePasswordCode(code:string):Promise<UserSimpleIdT & {passwordRecoveryCode:string}|null>{
         const user = await usersDb.findOne({passwordRecoveryCode: code})
         if(user && user.passwordRecoveryCode){
@@ -69,16 +69,16 @@ export const usersDbRepository = {
         } else{
             return null
         }
-    },
+    }
     async changeUserByIsConfirmedCode(id:string):Promise<boolean>{
-       try{
-        await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.isConfirmed': true}})
-        return true
-       } catch(e){
-           console.error(e)
-           return false
-       }
-       },
+        try{
+            await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.isConfirmed': true}})
+            return true
+        } catch(e){
+            console.error(e)
+            return false
+        }
+    }
     async changeUserByConfirmedCode(id:string,code:string):Promise<boolean>{
         try{
             await usersDb.updateOne({_id:new ObjectId(id)},{$set:{'emailConfirmation.confirmationCode': code}})
@@ -87,7 +87,7 @@ export const usersDbRepository = {
             console.error(e)
             return false
         }
-    },
+    }
     async changeUserPasswordCode(id:string,code:string):Promise<boolean>{
         try{
             await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: code}})
@@ -96,7 +96,7 @@ export const usersDbRepository = {
             console.error(e)
             return false
         }
-    },
+    }
     async changeUserPassword(id:string,passwordHash:string,passwordSalt:string):Promise<boolean>{
         try{
             await usersDb.updateOne({_id:new ObjectId(id)},{$set:{passwordRecoveryCode: "",passwordSalt: passwordSalt,passwordHash: passwordHash}})
@@ -105,16 +105,16 @@ export const usersDbRepository = {
             console.error(e)
             return false
         }
-    },
+    }
     async getUserLogin(login:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({login})
-    },
+    }
     async getUserEmail(email:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({email})
-    },
+    }
     async getUserByLoginOrEmail(loginOrEmail:string):Promise<UserMongoIdT|null> {
         return  usersDb.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
-    },
+    }
     async addUser(newUser:UserForBaseIdT): Promise<UserSimpleIdT>{
         const result = await usersDb.create(newUser);
         return {
@@ -123,7 +123,7 @@ export const usersDbRepository = {
             email: newUser.email,
             createdAt: newUser.createdAt,
         }
-    },
+    }
     async addDevicesSessions(userId: string, deviceSession: UserDevicesSessionsBaseT): Promise<boolean> {
         try {
             await usersDb.updateOne({_id:new ObjectId(userId)},{$push:{devicesSessions:deviceSession}});
@@ -132,7 +132,7 @@ export const usersDbRepository = {
             console.error(error);
             return false;
         }
-    },
+    }
     async findUserDevicesSessions(userId: string,ip:string,title:string):Promise<UserDevicesSessionsBaseT|null> {
         const user = await usersDb.findOne({_id:new ObjectId(userId)})
         const checkDeviceSession = user?.devicesSessions.find((deviceSession) => deviceSession.ip == ip && deviceSession.title.substring(0,46) == title.substring(0,46))
@@ -141,7 +141,7 @@ export const usersDbRepository = {
         }else {
             return checkDeviceSession
         }
-    },
+    }
     async newEnterDeviceSession(userId:string,deviceId:string):Promise<boolean> {
         try {
             await usersDb.updateOne({'devicesSessions.deviceId': deviceId}, {$set: {'devicesSessions.$.lastActiveDate': new Date().toISOString() }});
@@ -150,35 +150,35 @@ export const usersDbRepository = {
             console.error(error);
             return false
         }
-        },
+    }
     async removeOtherSession(userId:ObjectId,deviceId:string):Promise<boolean> {
-       try {
-           await usersDb.updateMany(
-               { _id: userId },
-               { $pull: { devicesSessions: { deviceId: { $ne: deviceId } } } }
-           )
-           return true
-       } catch (e){
-           console.error(e);
-           return false
-       }
-       },
+        try {
+            await usersDb.updateMany(
+                { _id: userId },
+                { $pull: { devicesSessions: { deviceId: { $ne: deviceId } } } }
+            )
+            return true
+        } catch (e){
+            console.error(e);
+            return false
+        }
+    }
     async checkDeviceSession(deviceId:string,userId:string):Promise<{message:string}> {
         try {
-           const checkDeviceSession = await usersDb.findOne({'devicesSessions.deviceId':deviceId});
-           if (!checkDeviceSession) {
-               return {message:"no device session"}
-           }
-           if(checkDeviceSession?._id.toString() !== userId){
-               return {message:"no permission"}
-           }
+            const checkDeviceSession = await usersDb.findOne({'devicesSessions.deviceId':deviceId});
+            if (!checkDeviceSession) {
+                return {message:"no device session"}
+            }
+            if(checkDeviceSession?._id.toString() !== userId){
+                return {message:"no permission"}
+            }
 
             return {message:"Okay"}
         } catch (e){
             console.error(e);
             return {message:"db error"}
         }
-    },
+    }
     async removeIdDeviceSession(userId:string,deviceId:string):Promise<boolean> {
         try {
             await usersDb.updateOne(
@@ -190,9 +190,11 @@ export const usersDbRepository = {
             console.error(e);
             return false
         }
-    },
+    }
     async delUser(id:string) {
         const result = await usersDb.deleteOne({_id:new ObjectId(id)})
         return result.deletedCount === 1
     }
 }
+
+export const usersDbRepository = new UsersDbRepository

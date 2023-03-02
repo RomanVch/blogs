@@ -1,13 +1,6 @@
-import {Schema} from "inspector";
-
 import mongoose from 'mongoose';
-import {
-    BlogMongoIdT,
-    CommentMongoIdT,
-    InfoServerT,
-    PostMongoIdT,
-    UserForBaseIdT
-} from "./types";
+import {BlogMongoIdT, CommentMongoIdT, InfoServerT, PostMongoIdT, UserForBaseIdT} from "./types";
+
 const { Schema } = mongoose;
 
 const blogSchema = new Schema<BlogMongoIdT>({
@@ -65,7 +58,8 @@ const commentsSchema = new Schema<CommentMongoIdT>({
         userId: String,
         userLogin: String
     },required:true},
-    createdAt: {type:String,required:true}
+    createdAt: {type:String,required:true},
+    likesInfo:{likes:[{id:String, date:String}],dislikes:[{id:String, date:String}] }
 });
 
 export const commentsModel = mongoose.model('comments', commentsSchema);

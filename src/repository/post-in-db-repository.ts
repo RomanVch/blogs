@@ -7,7 +7,7 @@ import {postsModel} from "./Schemas";
 
 export const postDb= postsModel //client.db("blogs").collection<PostMongoIdT>("posts");
 
-export const postInDbRepository = {
+export class PostInDbRepository {
     async getPosts(postQuery:PostsQueryT): Promise<EndRouterT<PostSimpleIdT[]>|null> {
         if(postQuery.pageNumber && postQuery.pageSize){
             const skip = (postQuery.pageNumber -1) * postQuery.pageSize;
@@ -29,7 +29,7 @@ export const postInDbRepository = {
             };
         }
         return null
-    },
+    }
     async getPostsBlog(blogId:string, blogsQuery:BlogsQueryT):Promise<EndRouterT<PostSimpleIdT[]>|null> {
         if(blogsQuery.pageNumber && blogsQuery.pageSize) {
             const skip = (blogsQuery.pageNumber - 1) * blogsQuery.pageSize;
@@ -51,21 +51,22 @@ export const postInDbRepository = {
             };
         }
         return null
-        },
+    }
     async getPostId(id:string):Promise<PostMongoIdT|null> {
         return postDb.findOne({_id: new ObjectId(id)})
-    },
+    }
     async addPost(newPostData:PostT): Promise<PostMongoIdT|null> {
-            await postDb.create(newPostData);
-            return newPostData as PostMongoIdT;
-    },
+        await postDb.create(newPostData);
+        return newPostData as PostMongoIdT;
+    }
     async correctPost(correctPostData:{id:string,title:string, shortDescription:string, content:string,blogId:string}):Promise<boolean>{
         const {id,title,shortDescription,content}= correctPostData
         const resultPost = await postDb.updateOne({_id:new ObjectId(id)},{$set: {title,shortDescription,content}})
         return resultPost.matchedCount === 1;
-    },
+    }
     async delPost(id:string){
         const result = await postDb.deleteOne({_id:new ObjectId(id)})
         return result.deletedCount === 1;}
 }
 
+export const postInDbRepository = new PostInDbRepository;

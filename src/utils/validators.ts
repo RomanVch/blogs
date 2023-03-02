@@ -6,6 +6,11 @@ import {postService} from "../domain/post-service";
 import {commentsService} from "../domain/comments-service";
 
 export const validBodyString = (field:string,min:number=1,max:number=30)=> body(field).isString().trim().isLength({min,max})
+
+export const validBodyLike = ()=> body('likeStatus').trim().custom((likeStatus)=>{
+ return likeStatus === "None" || likeStatus === "Like" || likeStatus === "Dislike";
+})
+
 export const validQueryString = (field:string) => {
     return query(field).optional().isString().trim()
 }
@@ -34,7 +39,7 @@ export const validParamPostId = ()=> param('id').isString().trim().isLength({min
     return true
 })
 export const validParamCommentId = ()=> param('id').isString().trim().isLength({min:1,max:1000}).custom(async commentId => {
-    const comment = await commentsService.getCommentById(commentId);
+    const comment = await commentsService.getCommentById(commentId,"noId");
     if (!comment) throw new Error()
     return true
 })

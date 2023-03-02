@@ -1,6 +1,4 @@
-import {ObjectId, WithId} from "mongodb";
-import add from "date-fns/add";
-import {Schema} from "inspector";
+import {WithId} from "mongodb";
 
 export type PostT = {
     title: string,
@@ -30,7 +28,7 @@ export type CommentT =     {
         userId: string,
         userLogin: string
     },
-    "createdAt": string
+    "createdAt": string,
 }
 
 export type BlogSimpleIdT = BlogT & { id:string };
@@ -39,9 +37,9 @@ export type BlogMongoIdT = WithId<BlogT>;
 export type PostSimpleIdT = PostT & { id:string };
 export type PostMongoIdT = WithId<PostT>;
 
-export type CommentSimpleIdT = CommentT & { id:string };
-export type CommentMongoIdT = WithId<CommentT>;
-export type NewCommentT = CommentT & { postId:string };
+export type CommentSimpleIdT = CommentT & { id:string, likesInfo:LikeCommentT };
+export type CommentMongoIdT = WithId<CommentT & {likesInfo:LikeCommentForDbT} >;
+export type NewCommentT = CommentT & { postId:string,likesInfo:LikeCommentForDbT };
 
 
 export type UserDevicesSessionsT =   {
@@ -53,11 +51,32 @@ export type UserDevicesSessionsT =   {
 export type UserDevicesSessionsBaseT =   UserDevicesSessionsT & {
     lastActiveDate: string,
 }
-export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, passwordRecoveryCode:string, emailConfirmation:{
-        isConfirmed:boolean,
-        expirationDate:Date,
-        confirmationCode:string,
+
+type EmailConfirmationT = {
+    isConfirmed:boolean,
+    expirationDate:Date,
+    confirmationCode:string,
 }
+type CommentatorInfoT = {
+    userId: string,
+    userLogin: string
+}
+export
+
+
+type StatusLikeT = "None"| "Like" | "Dislike";
+
+type LikeCommentT = {
+        likesCount: number,
+        dislikesCount: number,
+        myStatus: StatusLikeT
+};
+
+export type LikesObjectT = {id:string, date:string}
+
+export type LikeCommentForDbT = { likes: LikesObjectT[],dislikes: LikesObjectT[] }
+
+export type UserForBaseIdT = UserT & { passwordHash:string, passwordSalt:string, passwordRecoveryCode:string, emailConfirmation:EmailConfirmationT,
     devicesSessions:UserDevicesSessionsBaseT[]
 };
 export type UserSimpleIdT = UserT & { id:string };
@@ -77,4 +96,55 @@ export type RefreshTokenT = {
 }
 
 export type InfoServerT = {blackList:string[]}
+
+
+
+///// classes
+
+export class User {
+    constructor(
+                    public login: string,
+                    public email: string,
+                    public createdAt: string,
+                    public passwordHash:string,
+                    public passwordSalt:string,
+                    public passwordRecoveryCode:string,
+                    public emailConfirmation:EmailConfirmationT,
+                    public devicesSessions:UserDevicesSessionsBaseT[]
+    ){}
+}
+
+export class Blog {
+    constructor(
+       public name: string,
+       public description: string,
+       public websiteUrl: string,
+       public createdAt:string) {
+    }
+}
+
+
+export class Comment {
+    constructor(
+        public postId: string,
+        public content: string,
+        public commentatorInfo: CommentatorInfoT,
+        public createdAt:string,
+        public likesInfo: LikeCommentForDbT
+    ) {
+    }
+}
+
+export class Post {
+    constructor(
+       public title: string,
+       public shortDescription: string,
+       public content: string,
+       public blogId: string,
+       public blogName: string,
+       public createdAt:string,
+    ) {
+    }
+}
+
 

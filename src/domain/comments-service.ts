@@ -1,24 +1,33 @@
-import {CommentSimpleIdT, UserSimpleIdT} from "../repository/types";
-import {mapper} from "../utils/mapper";
-import {commentsDbRepository} from "../repository/comments-db-repository";
+import {Comment, CommentSimpleIdT, LikeCommentForDbT, UserSimpleIdT} from "../repository/types";
+import {CommentsDbRepository} from "../repository/comments-db-repository";
 import {PostsQueryT} from "../routers/postRouter";
 import {EndRouterT} from "../routers/blogsRouter";
 
-export const commentsService = {
-        async getPostComments(postId:string, commentQuery:PostsQueryT): Promise<EndRouterT<CommentSimpleIdT[]>|null> {
-        return commentsDbRepository.getPostsComments(postId,commentQuery)
-    },
-    async getCommentById(commentId:string):Promise<CommentSimpleIdT|null> {
-            return commentsDbRepository.getCommentById(commentId)
-},
+export class CommentService {
+    commentsInDbRepository: CommentsDbRepository;
+    constructor() {
+        this.commentsInDbRepository = new CommentsDbRepository;
+    }
+    async getPostComments(postId:string, commentQuery:PostsQueryT,userId:string): Promise<EndRouterT<CommentSimpleIdT[]>|null> {
+        return this.commentsInDbRepository.getPostsComments(postId,commentQuery,userId)
+    }
+    async getCommentById(commentId:string,userId:string):Promise<CommentSimpleIdT|null> {
+        return this.commentsInDbRepository.getCommentById(commentId,userId)
+    }
     async addComment(user:UserSimpleIdT,content:string, postId:string): Promise<CommentSimpleIdT> {
-        const newComment = mapper.getNewComment(user, content, postId)
-        return await commentsDbRepository.addComments(newComment)
-    },
+        const likesInfo:LikeCommentForDbT = {likes:[],dislikes:[]}
+        const newComment = new Comment(postId,content,{userId:user.id,userLogin:user.login},(new Date()).toISOString(),likesInfo)
+        return this.commentsInDbRepository.addComments(newComment)
+    }
     async correctComment(commentId:string, content:string):Promise<boolean> {
-            return await commentsDbRepository.correctComment(commentId,content)
-    },
+        return this.commentsInDbRepository.correctComment(commentId,content)
+    }
+    async changeLikeComment(commentId:string, likeStatus:string,userId:string):Promise<boolean> {
+        return this.commentsInDbRepository.changelikeComment(commentId,likeStatus,userId)
+    }
     async deleteCommentById(commentId:string):Promise<boolean> {
-        return await commentsDbRepository.deleteComment(commentId)
+        return this.commentsInDbRepository.deleteComment(commentId)
     }
 }
+
+export const commentsService = new CommentService();
