@@ -3,6 +3,7 @@ import {BlogMongoIdT, CommentMongoIdT, InfoServerT, PostMongoIdT, UserForBaseIdT
 
 const { Schema } = mongoose;
 
+
 const blogSchema = new Schema<BlogMongoIdT>({
     name:  {type:String,required:true},
     description:  {type:String,required:true},
